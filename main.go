@@ -1,41 +1,64 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
+	"flag"
 	"fmt"
+	"log"
+	"net/http"
 
-	"github.com/dghubble/go-twitter/twitter"
-	"github.com/dghubble/oauth1"
+	twitter "github.com/g8rswimmer/go-twitter/v2"
 )
 
+type authorize struct {
+	Token string
+}
+
+func (a authorize) Add(req *http.Request) {
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", a.Token))
+}
+
+/**
+	In order to run, the user will need to provide the bearer token and the list of tweet ids.
+**/
 func main() {
-	config := oauth1.NewConfig("Ft5kAkn7sHnB37kUBY5QTbICr", "o9cwZQmlzD9w0EYJNkAXPVufGZWqCLb281iLU417bmhdGRI0kx")
-	token := oauth1.NewToken("800117847774986240-QqjFVCDUNR2CwdagyM98jVgeMq7XP7x", "b2weC2a2Jl4zCXXaNllhHiDbgjoljup33gDLSzDFOBb3E")
-	httpClient := config.Client(oauth1.NoContext, token)
+	token := flag.String("token", "AAAAAAAAAAAAAAAAAAAAAEJMZAEAAAAATREsNZBtRYM5FBxAx85TZsuDxXo%3D70oukx89ou1hjnuSOzTqG47IuZVG3nL4Xxwvi1Oz8Z5V1vXW2k", "twitter API token")
+	userID := flag.String("user_id", "800117847774986240", "user id")
+	flag.Parse()
 
-	// Twitter client
-	client := twitter.NewClient(httpClient)
+	client := &twitter.Client{
+		Authorizer: authorize{
+			Token: *token,
+		},
+		Client: http.DefaultClient,
+		Host:   "https://api.twitter.com",
+	}
+	opts := twitter.UserTweetReverseChronologicalTimelineOpts{
+		TweetFields: []twitter.TweetField{twitter.TweetFieldCreatedAt, twitter.TweetFieldAuthorID, twitter.TweetFieldConversationID, twitter.TweetFieldPublicMetrics, twitter.TweetFieldContextAnnotations},
+		UserFields:  []twitter.UserField{twitter.UserFieldUserName},
+		Expansions:  []twitter.Expansion{twitter.ExpansionAuthorID},
+		MaxResults:  5,
+	}
 
-	// Home Timeline
-	tweets, _, err := client.Timelines.HomeTimeline(&twitter.HomeTimelineParams{
-		Count: 1000,
-	})
+	fmt.Println("Callout to tweet user reverse chronological timeline callout")
+
+	timeline, err := client.UserTweetReverseChronologicalTimeline(context.Background(), *userID, opts)
 	if err != nil {
-		fmt.Println(err)
-	}
-	// fmt.Println("RESP:\n", resp)
-	count := 0
-	for _, tweet := range tweets {
-		fmt.Printf("%d tweet: %s\n", count, tweet.Text)
-		count += 1
+		log.Panicf("user reverse chronological timeline error: %v", err)
 	}
 
-	// demux := twitter.NewSwitchDemux()
-	// demux.Tweet = func(tweet *twitter.Tweet) {
-	// 	fmt.Println(tweet.Text)
-	// }
-	// fmt.Println("DEMUX TWT\n\n")
-	// for _, tweet := range tweets {
-	// 	demux.Handle(tweet)
-	// }
+	dictionaries := timeline.Raw.TweetDictionaries()
 
+	enc, err := json.MarshalIndent(dictionaries, "", "    ")
+	if err != nil {
+		log.Panic(err)
+	}
+	fmt.Println(string(enc))
+
+	metaBytes, err := json.MarshalIndent(timeline.Meta, "", "    ")
+	if err != nil {
+		log.Panic(err)
+	}
+	fmt.Println(string(metaBytes))
 }
