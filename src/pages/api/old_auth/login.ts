@@ -7,8 +7,8 @@ const STATE = 'my-state';
 export default function login(req: NextApiRequest, res: NextApiResponse) {
   const authClient = new auth.OAuth2User({
     client_id: 'NGhyYlRDNk1rSUZpRHBHQVBocWQ6MTpjaQ',
-    client_secret: 'gFoy-RJdErRNShKD9tPqsvZpLAIWukPXxCaZ9liswAYu6BVwUq',
-    callback: 'http://localhost:3000/api/callback',
+    client_secret: '4dsAcaedKsev2B_-EFRkyyBDH76uMS_ocQwQ3zyoOaHoaZgGWy',
+    callback: 'http://localhost:3000/api/old_auth/callback',
     scopes: ['tweet.read', 'users.read', 'offline.access'],
   });
 

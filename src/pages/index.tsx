@@ -19,6 +19,13 @@ import { Client } from 'twitter-api-sdk';
  */
 import Vercel from '~/svg/Vercel.svg';
 
+const onSubmit = async (data) => {
+  const response = await fetch('/api/twitter', {
+    body: JSON.stringify({ accessToken: data.accessToken }),
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
+  });
+};
 export default function HomePage() {
   const { data: session } = useSession();
   if (!session) {
@@ -46,6 +53,8 @@ export default function HomePage() {
       </Layout>
     );
   } else {
+    console.log('session frontend', session);
+    onSubmit(session);
     return (
       <Layout>
         {/* <Seo templateTitle='Home' /> */}
@@ -103,8 +112,6 @@ export default function HomePage() {
 }
 
 export async function getServerSideProps() {
-  // const client = new Client("AAAAAAAAAAAAAAAAAAAAAEJMZAEAAAAAJCXby%2BrefHm2Fj4mK%2FuC6pXBZPY%3DqLig1DuR52eEL4o3G47SkRzc7s2BZd4v1Bh6RAeg9EwmLNkZu9");
-
   // // // Fetch data from external API
   // // const res = await fetch(`https://.../data`)
   // // const data = await res.json()

@@ -6394,7 +6394,7 @@ tsutils@^3.21.0:
 
 twitter-api-sdk@^1.1.0:
   version "1.1.0"
-  resolved "https://registry.npmjs.org/twitter-api-sdk/-/twitter-api-sdk-1.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/twitter-api-sdk/-/twitter-api-sdk-1.1.0.tgz#9bcf525a0c3da311683d3a87e74357ba8479ded6"
   integrity sha512-EmYSUwf1rw57h7fnq8SLtMSt6+8orr1N4q5m5J+R/ZSzvvo3QCCyJC973/OCxH5j9F1iV0vqpLmYh/Yq87XjLA==
   dependencies:
     abort-controller "^3.0.0"

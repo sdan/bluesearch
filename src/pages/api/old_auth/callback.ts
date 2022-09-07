@@ -9,8 +9,8 @@ export default async function callback(
 ) {
   const authClient = new auth.OAuth2User({
     client_id: 'NGhyYlRDNk1rSUZpRHBHQVBocWQ6MTpjaQ',
-    client_secret: 'gFoy-RJdErRNShKD9tPqsvZpLAIWukPXxCaZ9liswAYu6BVwUq',
-    callback: 'http://localhost:3000/api/callback',
+    client_secret: '4dsAcaedKsev2B_-EFRkyyBDH76uMS_ocQwQ3zyoOaHoaZgGWy',
+    callback: 'http://localhost:3000/api/old_auth/callback',
     scopes: ['tweet.read', 'users.read', 'offline.access'],
   });
 
@@ -32,9 +32,17 @@ export default async function callback(
     const bab = await authClient.requestAccessToken(code as string);
     console.log('BBAG', bab);
 
-    const tweets = await client.users.findMyUser();
+    // const tweets = await client.users.findMyUser();
 
-    console.log('tweets CALLBACK', tweets);
+    // console.log('tweets CALLBACK', tweets);
+
+    // const tweets = await client.users.usersIdTimeline('800117847774986240');
+    // const tweets = await authClient.
+    // console.log('OLD rev tweets', tweets);
+    // const tweet = await client.tweets.findTweetById('20');
+    const pages = await client.users.usersIdFollowers('TwitterDev');
+    console.log(pages);
+    // console.log(tweet.data.text);
 
     // res.redirect('/tweets');
   } catch (error) {
