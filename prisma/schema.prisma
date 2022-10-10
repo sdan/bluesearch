@@ -7,15 +7,16 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:TGlkDKx0xw0UQBN3dxc9@containers-us-west-48.railway.app:6317/railway"
+  url      = "postgresql://postgres:k4zw8x9Y2Wjzi14I3xtj@containers-us-west-48.railway.app:6317/railway"
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  // id                String  @id @default(cuid())
+  providerAccountId String @id
   userId            String
   type              String?
   provider          String?
-  providerAccountId String?
+  
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?

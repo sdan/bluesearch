@@ -1,52 +1,73 @@
 import { PrismaClient } from '@prisma/client';
-import { Client } from 'twitter-api-sdk';
+import { Client, types } from 'twitter-api-sdk';
 
 const prisma = new PrismaClient();
 
-async function getAccessToken() {
-  // const token = await prisma.token.findUnique({
-}
+// create tweets to prisma db
+// export async function saveTweets(data) {
+//   const tweets = data.map((tweet) => {
+//     return {
+//       data: {
+//         tweetId: tweet.id,
+//         text: tweet.text,
+//         createdAt: tweet.created_at,
+//         geo: tweet.geo,
+//         publicMetrics: tweet.public_metrics,
+//       },
+//     };
+//   });
+
+//   const savedTweets = await prisma.tweet.createMany({
+//     data: tweets,
+//     skipDuplicates: true,
+//   });
+
+//   return savedTweets;
+// }
 
 export default async function handle(req: any, res: any) {
+  console.log('req.body', req.body);
   const { accessToken } = req.body;
   const tClient = new Client(accessToken);
-  // const tClient = new Client(
-  //   'AAAAAAAAAAAAAAAAAAAAAEJMZAEAAAAA81C7ZNZ2aZUbFVMiNvL98fgPZzQ%3DaNcYZ6qJgJynX21QIp1NtJVuJxXE1c55OXoGzBPXt3PXnkSlzG'
-  // );
 
-  // const tweet = await client.tweets.findTweetById('20');
-  // console.log('TWT TWEET DATA', tweet.data.text);
-  // console.log('req', req);
   console.log('api route twitter', accessToken);
 
   // const tweets = await prisma.tweet.findMany();
   // res.status(200).json(tweets);
 
-  // console.log('API ROUTE', tClient);
-  // const tweets = await tClient.users.usersIdTimeline('800117847774986240');
-  // console.log('rev tweets', tweets);
-
-  // const pages = await tClient.users.usersIdFollowers('800117847774986240');
-  // console.log(pages);
-
-  // const flwrs = await tClient.users.usersIdFollowers('800117847774986240');
-  // console.log('FLW TWEET', flwrs);
-
   const {
     data: { id },
   } = await tClient.users.findMyUser();
+
   console.log('twtr ID', id);
 
-  const params: any = {
-    expansions: 'author_id',
-    'user.fields': ['username', 'created_at'],
-    'tweet.fields': ['geo', 'entities', 'context_annotations'],
+  const params = {
+    max_results: 100,
+    // 'user.fields': ['username', 'created_at'],
+    'tweet.fields': ['geo', 'public_metrics', 'created_at', 'entities'],
   };
 
-  const getUsersTimeline = await tClient.tweets.usersIdTimeline(id, params);
-  console.dir(getUsersTimeline, {
-    depth: null,
-  });
+  const getUsersTimeline = tClient.tweets.usersIdTimeline(id, params);
+  let numTweets = 0;
+
+  for await (const page of getUsersTimeline) {
+    // console.log('like counts: ', page?.data?.public_metrics?.like_count);
+    // const twett:types.tweet
+    for (const twt of page.data) {
+      console.log('Tweet: ', twt.text);
+      console.log('id: ', twt.id);
+      console.log('likes:', twt.public_metrics?.like_count);
+      console.log('retweets:', twt.public_metrics?.retweet_count);
+      console.log('time: ', twt.created_at);
+      console.log('geo: ', twt.geo);
+      console.log('entities: ', twt.entities);
+    }
+    numTweets += page?.meta?.result_count || 0;
+    // console.log('pag tweet', page);
+    console.log('cumtweets:', numTweets);
+  }
+
+  console.log('GUT INCLUDES', getUsersTimeline.meta);
 
   res.status(200).json({ fuck: 'you' });
 }

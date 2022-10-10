@@ -1,5 +1,5 @@
 import * as React from 'react';
-
+import { useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import ArrowLink from '@/components/links/ArrowLink';
 import ButtonLink from '@/components/links/ButtonLink';
@@ -7,7 +7,9 @@ import UnderlineLink from '@/components/links/UnderlineLink';
 import UnstyledLink from '@/components/links/UnstyledLink';
 import Seo from '@/components/Seo';
 import { signIn, signOut, useSession } from 'next-auth/react';
-0;
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
+
 import { Client } from 'twitter-api-sdk';
 
 /**
@@ -19,15 +21,58 @@ import { Client } from 'twitter-api-sdk';
  */
 import Vercel from '~/svg/Vercel.svg';
 
-const onSubmit = async (data) => {
-  const response = await fetch('/api/twitter', {
-    body: JSON.stringify({ accessToken: data.accessToken }),
-    headers: { 'Content-Type': 'application/json' },
-    method: 'POST',
-  });
-};
 export default function HomePage() {
   const { data: session } = useSession();
+
+  // const fetcher: any(data) = (url: any) => fetch(url, {
+  //   body: JSON.stringify({ accessToken: data.accessToken }),
+  //   headers: { 'Content-Type': 'application/json' },
+  //   method: 'POST',
+  // } ).then((r) => r.json();
+
+  // const fetcher = async (data: { accessToken: any }) => {
+  //   const response = await fetch('/api/twitter', {
+  //     body: JSON.stringify({ accessToken: data.accessToken }),
+  //     headers: { 'Content-Type': 'application/json' },
+  //     method: 'POST',
+  //   });
+  //   return response.json();
+  // };
+
+  async function sendRequest(url: any, { arg }) {
+    console.log('access token fetcher', arg.arg);
+    return fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      body: JSON.stringify({ accessToken: arg.arg }),
+    });
+  }
+
+  // useEffect(() => {
+  //   if (!session) {
+  //     return;
+  //   }
+
+  //   const fetchTwitter = async (data) => {
+  //     const response = await fetch('/api/twitter', {
+  //       body: JSON.stringify({ accessToken: data.accessToken }),
+  //       headers: { 'Content-Type': 'application/json' },
+  //       method: 'POST',
+  //     });
+  //   };
+
+  //   fetchTwitter(session);
+  // }, [session]);
+
+  // const fetchTwitter = async (data) => {
+  //   const response = await fetch('/api/twitter', {
+  //     body: JSON.stringify({ accessToken: data.accessToken }),
+  //     headers: { 'Content-Type': 'application/json' },
+  //     method: 'POST',
+  //   });
+  // };
+
+  const { trigger } = useSWRMutation(['/api/twitter'], sendRequest);
   if (!session) {
     return (
       <Layout>
@@ -54,7 +99,7 @@ export default function HomePage() {
     );
   } else {
     console.log('session frontend', session);
-    onSubmit(session);
+    // fetchTwitter(session);
     return (
       <Layout>
         {/* <Seo templateTitle='Home' /> */}
@@ -64,7 +109,7 @@ export default function HomePage() {
           <section className='bg-white'>
             <div className='layout flex min-h-screen flex-col items-center justify-center text-center'>
               <Vercel className='text-5xl' />
-              <h1 className='mt-4'>hello world</h1>
+              <h1 className='mt-4'>🦅🦅🦅🦅</h1>
               <p className='mt-2 text-sm text-gray-800'>
                 A starter for Next.js, Tailwind CSS, and TypeScript with
                 Absolute Import, Seo, Link component, pre-configured with Husky{' '}
@@ -83,6 +128,14 @@ export default function HomePage() {
                     href={''}
                   >
                     sign out
+                  </ButtonLink>
+                  <ButtonLink
+                    className='mt-6'
+                    onClick={() => trigger({ arg: session.accessToken })}
+                    variant='dark'
+                    href={''}
+                  >
+                    fetch tweets
                   </ButtonLink>
                 </>
               </p>
