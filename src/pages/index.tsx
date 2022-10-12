@@ -10,6 +10,7 @@ import { signIn, signOut, useSession, getSession } from 'next-auth/react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { PrismaClient } from '@prisma/client';
+import { Tweet } from 'react-static-tweets';
 
 import { Client } from 'twitter-api-sdk';
 
@@ -22,7 +23,12 @@ import { Client } from 'twitter-api-sdk';
  */
 import Vercel from '~/svg/Vercel.svg';
 
-export default function HomePage() {
+type Props = {
+  tweetlist: any[];
+};
+
+export default function HomePage({ tweetlist }: Props) {
+  console.log('tweetlist front', tweetlist);
   const { data: session } = useSession();
 
   // const fetcher: any(data) = (url: any) => fetch(url, {
@@ -100,6 +106,7 @@ export default function HomePage() {
     );
   } else {
     console.log('session frontend', session);
+    console.log('tweetlist frontend', tweetlist);
     return (
       <Layout>
         {/* <Seo templateTitle='Home' /> */}
@@ -140,6 +147,23 @@ export default function HomePage() {
                 </>
               </p>
 
+              <Tweet id={'1580024227872526336'} />
+
+              {tweetlist ? (
+                <ul>
+                  {tweetlist.map((value: any, index: any) => {
+                    // return <li key={index}>{value.id}</li>;
+                    return (
+                      <li key={index}>
+                        <Tweet id={value.id} />
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p>no tweets</p>
+              )}
+
               <ButtonLink className='mt-6' href='/components' variant='light'>
                 See all components
               </ButtonLink>
@@ -169,17 +193,19 @@ export async function getServerSideProps({ req, res }) {
   console.log('index session', session);
   console.log('index session.accessToken', session?.accessToken);
   console.log('index session.twtrId', session?.twtrId);
-
+  let tweetlist: any = [];
   if (session && session.twtrId) {
     console.log("session exists and user's twitter id exists");
     const prisma = new PrismaClient();
-    const twts = await prisma.tweet.findMany({
+    tweetlist = await prisma.tweet.findMany({
       where: {
         userId: session?.twtrId,
       },
     });
-    console.log('twts', twts);
   }
+  console.log('twts', tweetlist);
 
-  return { props: {} };
+  return {
+    props: { tweetlist: JSON.parse(JSON.stringify(tweetlist)) },
+  };
 }

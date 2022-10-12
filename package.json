@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "eslint src --fix && yarn format",
-    "lint:strict": "eslint --max-warnings=50 src",
+    "lint:strict": "eslint --max-warnings=100 src",
     "typecheck": "tsc --noEmit --incremental false",
     "test:watch": "jest --watch",
     "test": "jest",
@@ -23,11 +23,14 @@
     "@types/twitter": "^1.7.1",
     "clsx": "^1.2.1",
     "cookie": "^0.5.0",
+    "date-fns": "^2.29.3",
     "next": "^12.2.5",
     "next-auth": "^4.10.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.4.0",
+    "react-static-tweets": "^0.8.0",
+    "static-tweets": "^0.8.0",
     "swr": "2.0.0-beta.6",
     "tailwind-merge": "^1.6.0",
     "twitter-api-sdk": "^1.1.0"
@@ -62,7 +65,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
-      "eslint --max-warnings=50",
+      "eslint --max-warnings=100",
       "prettier -w"
     ],
     "src/**/*.{json,css,scss,md}": [

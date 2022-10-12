@@ -28,20 +28,20 @@ export default NextAuth({
     async jwt({ token, account }) {
       console.log('JWT token', token);
       console.log('JWT account', account);
-      // if (account) {
-      //   token.accessToken = account.access_token;
-      //   console.log('JWT account.accessToken', token.accessToken);
+      if (account) {
+        token.accessToken = account.access_token;
+        console.log('JWT account.accessToken', token.accessToken);
 
-      //   const tClient = new Client(String(token.accessToken));
+        // const tClient = new Client(String(token.accessToken));
 
-      //   const {
-      //     data: { id },
-      //   } = await tClient.users.findMyUser();
+        // const {
+        //   data: { id },
+        // } = await tClient.users.findMyUser();
 
-      //   console.log('JWT twtrId', id);
+        // console.log('JWT twtrId', id);
 
-      //   token.twtrId = id;
-      // }
+        // token.twtrId = id;
+      }
       return token;
     },
     async session({ session, token, user }) {
