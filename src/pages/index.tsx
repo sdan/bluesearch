@@ -6,9 +6,10 @@ import ButtonLink from '@/components/links/ButtonLink';
 import UnderlineLink from '@/components/links/UnderlineLink';
 import UnstyledLink from '@/components/links/UnstyledLink';
 import Seo from '@/components/Seo';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, signOut, useSession, getSession } from 'next-auth/react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { PrismaClient } from '@prisma/client';
 
 import { Client } from 'twitter-api-sdk';
 
@@ -99,7 +100,6 @@ export default function HomePage() {
     );
   } else {
     console.log('session frontend', session);
-    // fetchTwitter(session);
     return (
       <Layout>
         {/* <Seo templateTitle='Home' /> */}
@@ -164,21 +164,22 @@ export default function HomePage() {
   }
 }
 
-export async function getServerSideProps() {
-  // // // Fetch data from external API
-  // // const res = await fetch(`https://.../data`)
-  // // const data = await res.json()
-  // console.log("ssp")
-  // async function main() {
-  //   console.log("in main")
-  //   const stream = client.tweets.usersIdTimeline("800117847774986240")
-  //   for await (const tweet of stream) {
-  //     console.log(tweet.data?.toString);
-  //   }
-  // }
-  // main()
+export async function getServerSideProps({ req, res }) {
+  const session = await getSession({ req });
+  console.log('index session', session);
+  console.log('index session.accessToken', session?.accessToken);
+  console.log('index session.twtrId', session?.twtrId);
 
-  // Pass data to the page via props
-  // return { props: { data } }
+  if (session && session.twtrId) {
+    console.log("session exists and user's twitter id exists");
+    const prisma = new PrismaClient();
+    const twts = await prisma.tweet.findMany({
+      where: {
+        userId: session?.twtrId,
+      },
+    });
+    console.log('twts', twts);
+  }
+
   return { props: {} };
 }

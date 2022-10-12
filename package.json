@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "eslint src --fix && yarn format",
-    "lint:strict": "eslint --max-warnings=0 src",
+    "lint:strict": "eslint --max-warnings=50 src",
     "typecheck": "tsc --noEmit --incremental false",
     "test:watch": "jest --watch",
     "test": "jest",
@@ -20,6 +20,7 @@
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.4",
     "@prisma/client": "^4.3.1",
+    "@types/twitter": "^1.7.1",
     "clsx": "^1.2.1",
     "cookie": "^0.5.0",
     "next": "^12.2.5",
@@ -61,7 +62,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
-      "eslint --max-warnings=0",
+      "eslint --max-warnings=50",
       "prettier -w"
     ],
     "src/**/*.{json,css,scss,md}": [

@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import TwitterProvider from 'next-auth/providers/twitter';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
+import { Client } from 'twitter-api-sdk';
 
 const prisma = new PrismaClient();
 
@@ -27,19 +28,37 @@ export default NextAuth({
     async jwt({ token, account }) {
       console.log('JWT token', token);
       console.log('JWT account', account);
-      // console.log('JWT profile', profile);
-      // console.log('JWT isNewUser', isNewUser);
-      if (account) {
-        token.accessToken = account.access_token;
-        console.log('JWT account.accessToken', token.accessToken);
-      }
+      // if (account) {
+      //   token.accessToken = account.access_token;
+      //   console.log('JWT account.accessToken', token.accessToken);
+
+      //   const tClient = new Client(String(token.accessToken));
+
+      //   const {
+      //     data: { id },
+      //   } = await tClient.users.findMyUser();
+
+      //   console.log('JWT twtrId', id);
+
+      //   token.twtrId = id;
+      // }
       return token;
     },
     async session({ session, token, user }) {
       console.log('SS SESSSION', session);
       console.log('SS TTTOOKKKEN', token);
       console.log('SS USER', user);
+      const tClient = new Client(String(token.accessToken));
+      console.log('SS TOKENACCESS', String(token.accessToken));
+
+      const {
+        data: { id },
+      } = await tClient.users.findMyUser();
+
+      console.log('SS twtrId', id);
+
       session.accessToken = token.accessToken;
+      session.twtrId = id;
       return session;
     },
   },

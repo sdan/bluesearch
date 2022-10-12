@@ -1,29 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import { Client, types } from 'twitter-api-sdk';
-
+import { Client } from 'twitter-api-sdk';
+import { saveTweet } from './storetweets';
+import { components } from 'twitter-api-sdk/dist/types';
+type Tweet = components['schemas']['Tweet'];
 const prisma = new PrismaClient();
-
-// create tweets to prisma db
-// export async function saveTweets(data) {
-//   const tweets = data.map((tweet) => {
-//     return {
-//       data: {
-//         tweetId: tweet.id,
-//         text: tweet.text,
-//         createdAt: tweet.created_at,
-//         geo: tweet.geo,
-//         publicMetrics: tweet.public_metrics,
-//       },
-//     };
-//   });
-
-//   const savedTweets = await prisma.tweet.createMany({
-//     data: tweets,
-//     skipDuplicates: true,
-//   });
-
-//   return savedTweets;
-// }
 
 export default async function handle(req: any, res: any) {
   console.log('req.body', req.body);
@@ -44,7 +24,13 @@ export default async function handle(req: any, res: any) {
   const params = {
     max_results: 100,
     // 'user.fields': ['username', 'created_at'],
-    'tweet.fields': ['geo', 'public_metrics', 'created_at', 'entities'],
+    'tweet.fields': [
+      'author_id',
+      'geo',
+      'public_metrics',
+      'created_at',
+      'entities',
+    ],
   };
 
   const getUsersTimeline = tClient.tweets.usersIdTimeline(id, params);
@@ -53,14 +39,16 @@ export default async function handle(req: any, res: any) {
   for await (const page of getUsersTimeline) {
     // console.log('like counts: ', page?.data?.public_metrics?.like_count);
     // const twett:types.tweet
-    for (const twt of page.data) {
+    let twt: Tweet;
+    for (twt of page.data) {
       console.log('Tweet: ', twt.text);
+      console.log('author: ', twt.author_id);
       console.log('id: ', twt.id);
       console.log('likes:', twt.public_metrics?.like_count);
       console.log('retweets:', twt.public_metrics?.retweet_count);
       console.log('time: ', twt.created_at);
-      console.log('geo: ', twt.geo);
       console.log('entities: ', twt.entities);
+      await saveTweet(prisma, twt, id);
     }
     numTweets += page?.meta?.result_count || 0;
     // console.log('pag tweet', page);

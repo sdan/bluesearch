@@ -7,35 +7,35 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:k4zw8x9Y2Wjzi14I3xtj@containers-us-west-48.railway.app:6317/railway"
+  url      = "postgresql://postgres:nkzus3oRFP4FyrCJsWqT@containers-us-west-95.railway.app:5462/railway"
 }
 
 model Account {
-  // id                String  @id @default(cuid())
-  providerAccountId String @id
+  providerAccountId String  @id
   userId            String
   type              String?
   provider          String?
-  
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refresh_token String? @db.Text
+  access_token  String? @db.Text
+  expires_at    Int?
+  token_type    String?
+  scope         String?
+  id_token      String? @db.Text
+  session_state String?
+
+  user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Tweet Tweet[]
 
   @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerAccountId String   @id
+  sessionToken      String   @unique
+  userId            String
+  expires           DateTime
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -46,7 +46,6 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  tweets        Tweet[]
 }
 
 model VerificationToken {
@@ -59,9 +58,16 @@ model VerificationToken {
 
 model Tweet {
   id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  userId    String
-  content   String
+  author    String
+  text      String
   likes     Int      @default(0)
-  author    User     @relation(fields: [userId], references: [id])
+  retweets  Int      @default(0)
+  entities  Json?
+  createdAt DateTime
+  userId    String
+
+  user Account @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
+
+  // account    Account     @relation(fields: [id], references: [providerAccountId])
+  @@unique([id])
 }
