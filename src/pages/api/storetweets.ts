@@ -15,8 +15,14 @@ export async function saveTweet(
   providerAccountId: any
 ) {
   console.log('tweets in storetweets');
-  const twt = await pc.tweet.create({
-    data: {
+  const twt = await pc.tweet.upsert({
+    where: {
+      id: tweetData.id,
+    },
+    update: {
+      likes: tweetData.public_metrics?.like_count,
+    },
+    create: {
       id: tweetData.id,
       author: tweetData.author_id!,
       text: tweetData.text,

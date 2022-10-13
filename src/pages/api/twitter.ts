@@ -20,10 +20,10 @@ export default async function handle(req: any, res: any) {
   } = await tClient.users.findMyUser();
 
   console.log('twtr ID', id);
-
+  // params with max results of 100 and a start time of 1 day ago
   const params = {
     max_results: 100,
-    // 'user.fields': ['username', 'created_at'],
+    start_time: new Date(Date.now() - 86400000).toISOString(),
     'tweet.fields': [
       'author_id',
       'geo',

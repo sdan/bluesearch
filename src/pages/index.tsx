@@ -105,8 +105,8 @@ export default function HomePage({ tweetlist }: Props) {
       </Layout>
     );
   } else {
-    console.log('session frontend', session);
-    console.log('tweetlist frontend', tweetlist);
+    // console.log('session frontend', session);
+    // console.log('tweetlist frontend', tweetlist);
     return (
       <Layout>
         {/* <Seo templateTitle='Home' /> */}
@@ -115,18 +115,13 @@ export default function HomePage({ tweetlist }: Props) {
         <main>
           <section className='bg-white'>
             <div className='layout flex min-h-screen flex-col items-center justify-center text-center'>
-              <Vercel className='text-5xl' />
-              <h1 className='mt-4'>🦅🦅🦅🦅</h1>
+              <h1 className='mt-4'>🦅🦅 Tanager 🦅🦅</h1>
               <p className='mt-2 text-sm text-gray-800'>
-                A starter for Next.js, Tailwind CSS, and TypeScript with
-                Absolute Import, Seo, Link component, pre-configured with Husky{' '}
+                Tweets sorted by likes{' '}
               </p>
               <p className='mt-2 text-sm text-gray-700'>
-                {/* <ArrowLink href='https://github.com/theodorusclarence/ts-nextjs-tailwind-starter'>
-                See the repository
-              </ArrowLink> */}
                 <>
-                  <h2>your username is {session!.user?.name}</h2>
+                  <h2>welcome {session!.user?.name}</h2>
 
                   <ButtonLink
                     className='mt-6'
@@ -147,39 +142,23 @@ export default function HomePage({ tweetlist }: Props) {
                 </>
               </p>
 
-              <Tweet id={'1580024227872526336'} />
-
               {tweetlist ? (
                 <ul>
                   {tweetlist.map((value: any, index: any) => {
                     // return <li key={index}>{value.id}</li>;
                     return (
-                      <li key={index}>
-                        <Tweet id={value.id} />
-                      </li>
+                      <>
+                        <li key={index}>
+                          <Tweet id={value.id} />
+                        </li>
+                        <br></br>
+                      </>
                     );
                   })}
                 </ul>
               ) : (
                 <p>no tweets</p>
               )}
-
-              <ButtonLink className='mt-6' href='/components' variant='light'>
-                See all components
-              </ButtonLink>
-
-              <UnstyledLink
-                href='https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Ftheodorusclarence%2Fts-nextjs-tailwind-starter'
-                className='mt-4'
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  width='92'
-                  height='32'
-                  src='https://vercel.com/button'
-                  alt='Deploy with Vercel'
-                />
-              </UnstyledLink>
             </div>
           </section>
         </main>
@@ -197,9 +176,25 @@ export async function getServerSideProps({ req, res }) {
   if (session && session.twtrId) {
     console.log("session exists and user's twitter id exists");
     const prisma = new PrismaClient();
+    // tweetlist = await prisma.tweet.findMany({
+    //   orderBy: {
+    //     likes: 'desc',
+    //   },
+    //   where: {
+    //     userId: session?.twtrId,
+    //   },
+    // });
+
+    //find tweets by user id and sort by likes in descending order (most likes first) for the past 24 hours
     tweetlist = await prisma.tweet.findMany({
+      orderBy: {
+        likes: 'desc',
+      },
       where: {
         userId: session?.twtrId,
+        createdAt: {
+          gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+        },
       },
     });
   }
