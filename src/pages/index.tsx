@@ -27,6 +27,11 @@ type Props = {
   tweetlist: any[];
 };
 
+type Session = {
+  accessToken: string;
+  twtrId: string;
+};
+
 export default function HomePage({ tweetlist }: Props) {
   console.log('tweetlist front', tweetlist);
   const { data: session } = useSession();
@@ -45,13 +50,23 @@ export default function HomePage({ tweetlist }: Props) {
   //   });
   //   return response.json();
   // };
-
-  async function sendRequest(url: any, { arg }) {
-    console.log('access token fetcher', arg.arg);
+  type ApiRequest = {
+    arg: {
+      accessToken: any;
+      twtrId: any;
+    };
+  };
+  async function sendRequest(url: any, arg: ApiRequest) {
+    console.log('access token fetcher', arg);
+    console.log('arg.accessToken', arg.arg.accessToken);
+    console.log('arg.twtrId', arg.arg.twtrId);
     return fetch(url, {
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
-      body: JSON.stringify({ accessToken: arg.arg }),
+      body: JSON.stringify({
+        accessToken: arg.arg.accessToken,
+        twtrId: arg.arg.twtrId,
+      }),
     });
   }
 
@@ -80,6 +95,7 @@ export default function HomePage({ tweetlist }: Props) {
   // };
 
   const { trigger } = useSWRMutation(['/api/twitter'], sendRequest);
+
   if (!session) {
     return (
       <Layout>
@@ -133,7 +149,12 @@ export default function HomePage({ tweetlist }: Props) {
                   </ButtonLink>
                   <ButtonLink
                     className='mt-6'
-                    onClick={() => trigger({ arg: session.accessToken })}
+                    onClick={() =>
+                      trigger({
+                        accessToken: session.accessToken!,
+                        twtrId: session.twtrId!,
+                      })
+                    }
                     variant='dark'
                     href={''}
                   >
@@ -167,7 +188,7 @@ export default function HomePage({ tweetlist }: Props) {
   }
 }
 
-export async function getServerSideProps({ req, res }) {
+export async function getServerSideProps({ req, res }: any) {
   const session = await getSession({ req });
   console.log('index session', session);
   console.log('index session.accessToken', session?.accessToken);

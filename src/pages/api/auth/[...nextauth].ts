@@ -18,11 +18,10 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile, location }) {
+    async signIn({ user, account, profile }) {
       console.log('SI user', user);
       console.log('SI account', account);
       console.log('SI profile', profile);
-      console.log('SI location', location);
       return true;
     },
     async jwt({ token, account }) {
@@ -51,9 +50,8 @@ export default NextAuth({
       const tClient = new Client(String(token.accessToken));
       console.log('SS TOKENACCESS', String(token.accessToken));
 
-      const {
-        data: { id },
-      } = await tClient.users.findMyUser();
+      const id = (await tClient.users.findMyUser()).data?.id;
+      // const id: any = await tClient.users.findMyUser();
 
       console.log('SS twtrId', id);
 
@@ -67,7 +65,6 @@ export default NextAuth({
     // This option can be used with or without a database for users/accounts.
     // Note: `jwt` is automatically set to `true` if no database is specified.
     strategy: 'jwt',
-    jwt: true,
 
     // Seconds - How long until an idle session expires and is no longer valid.
     maxAge: 30 * 24 * 60 * 60, // 30 days

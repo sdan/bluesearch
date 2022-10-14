@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export default async function handle(req: any, res: any) {
   console.log('req.body', req.body);
-  const { accessToken } = req.body;
+  const { accessToken, twtrId } = req.body;
   const tClient = new Client(accessToken);
 
   console.log('api route twitter', accessToken);
@@ -15,13 +15,15 @@ export default async function handle(req: any, res: any) {
   // const tweets = await prisma.tweet.findMany();
   // res.status(200).json(tweets);
 
-  const {
-    data: { id },
-  } = await tClient.users.findMyUser();
+  // const {
+  //   data: { id },
+  // } = await tClient.users.findMyUser();
 
-  console.log('twtr ID', id);
+  console.log('twtr ID', twtrId);
   // params with max results of 100 and a start time of 1 day ago
-  const params = {
+  // const params = ;
+
+  const getUsersTimeline = tClient.tweets.usersIdTimeline(twtrId, {
     max_results: 100,
     start_time: new Date(Date.now() - 86400000).toISOString(),
     'tweet.fields': [
@@ -31,16 +33,14 @@ export default async function handle(req: any, res: any) {
       'created_at',
       'entities',
     ],
-  };
-
-  const getUsersTimeline = tClient.tweets.usersIdTimeline(id, params);
+  });
   let numTweets = 0;
 
   for await (const page of getUsersTimeline) {
     // console.log('like counts: ', page?.data?.public_metrics?.like_count);
     // const twett:types.tweet
     let twt: Tweet;
-    for (twt of page.data) {
+    for (twt of page.data ?? []) {
       console.log('Tweet: ', twt.text);
       console.log('author: ', twt.author_id);
       console.log('id: ', twt.id);
@@ -48,14 +48,14 @@ export default async function handle(req: any, res: any) {
       console.log('retweets:', twt.public_metrics?.retweet_count);
       console.log('time: ', twt.created_at);
       console.log('entities: ', twt.entities);
-      await saveTweet(prisma, twt, id);
+      await saveTweet(prisma, twt, twtrId);
     }
     numTweets += page?.meta?.result_count || 0;
     // console.log('pag tweet', page);
     console.log('cumtweets:', numTweets);
   }
 
-  console.log('GUT INCLUDES', getUsersTimeline.meta);
+  // console.log('GUT INCLUDES', getUsersTimeline.meta);
 
   res.status(200).json({ fuck: 'you' });
 }
