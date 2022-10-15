@@ -9,7 +9,7 @@ export default function handle(req: NextApiRequest, res: NextApiResponse) {
   res.status(200).json({ fuck: 'you' });
 }
 
-export async function saveTweet(
+export async function StoreTweet(
   pc: PrismaClient,
   tweetData: Tweet,
   providerAccountId: any
