@@ -26,8 +26,10 @@ export default function HomePage() {
     // console.log('access token fetcher', session?.accessToken, session?.twtrId);
     // console.log('arg.accessToken', arg.accessToken);
     // console.log('arg.twtrId', arg.twtrId);
-    console.log('PT args', args);
-    console.log('url', args.url);
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('PT args', args);
+      console.log('url', args.url);
+    }
     return fetch(args.url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -41,8 +43,10 @@ export default function HomePage() {
     // console.log('access token fetcher', session?.accessToken, session?.twtrId);
     // console.log('arg.accessToken', arg.accessToken);
     // console.log('arg.twtrId', arg.twtrId);
-    console.log('FT args', args);
-    console.log('url', args.url);
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('FT args', args);
+      console.log('url', args.url);
+    }
     return fetch(args.url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -61,8 +65,9 @@ export default function HomePage() {
     accessToken: '',
     twtrId: session?.twtrId,
   };
-
-  console.log('session?.twtrId', session?.twtrId);
+  if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+    console.log('session?.twtrId', session?.twtrId);
+  }
   // const { data: twtrList } = useSWR(
   //   ['/api/twitter/pull', session?.twtrId],
   //   pullTweets
@@ -72,12 +77,18 @@ export default function HomePage() {
     pullTweets
   );
   if (error) {
-    console.log('error', error);
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('error', error);
+    }
   }
   if (data) {
-    console.log('tweetsFromDB', data[0]);
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('tweetsFromDB', data[0]);
+    }
   } else {
-    console.log('no data');
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('no data');
+    }
   }
 
   const fetchTweetArgs: ApiRequest = {
@@ -88,7 +99,9 @@ export default function HomePage() {
     { url: '/api/twitter/fetch', args: fetchTweetArgs },
     fetchTweets
   );
-  console.log('fetchedTweets', fetchedTweets);
+  if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+    console.log('fetchedTweets', fetchedTweets);
+  }
 
   if (!session) {
     return (
