@@ -137,7 +137,7 @@ export default function HomePage() {
             <div className='layout flex min-h-screen flex-col items-center justify-center text-center'>
               <h1 className='mt-4'>🐥🐥🐥 Tanager 🐥🐥🐥</h1>
               <p className='mt-2 text-sm text-gray-800'>
-                Tweets sorted by likes{' '}
+                Tweets from the past 24h sorted by likes{' '}
               </p>
               <p className='mt-2 text-sm text-gray-700'>
                 <>
