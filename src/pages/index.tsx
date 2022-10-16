@@ -111,7 +111,7 @@ export default function HomePage() {
           <section className='bg-white'>
             <div className='layout flex min-h-screen flex-col items-center justify-center text-center text-black'>
               <h1 className='drop-shadow-glow animate-flicker text-4xl text-red-500 md:text-6xl'>
-                🦅🦅🦅 🦅🦅🦅
+                🐥🐥🐥 🐥🐥🐥
               </h1>
               <br />
               <ButtonLink
@@ -135,7 +135,7 @@ export default function HomePage() {
         <main>
           <section className='bg-white'>
             <div className='layout flex min-h-screen flex-col items-center justify-center text-center'>
-              <h1 className='mt-4'>🦅🦅 Tanager 🦅🦅</h1>
+              <h1 className='mt-4'>🐥🐥🐥 Tanager 🐥🐥🐥</h1>
               <p className='mt-2 text-sm text-gray-800'>
                 Tweets sorted by likes{' '}
               </p>
@@ -190,33 +190,3 @@ export default function HomePage() {
     );
   }
 }
-
-// export async function getServerSideProps({ req, res }: any) {
-//   const session = await getSession({ req });
-//   console.log('index session', session);
-//   console.log('index session.accessToken', session?.accessToken);
-//   console.log('index session.twtrId', session?.twtrId);
-//   let tweetlist: any = [];
-//   if (session && session.twtrId) {
-//     console.log("session exists and user's twitter id exists");
-//     const prisma = new PrismaClient();
-
-//     //find tweets by user id and sort by likes in descending order (most likes first) for the past 24 hours
-//     tweetlist = await prisma.tweet.findMany({
-//       orderBy: {
-//         likes: 'desc',
-//       },
-//       where: {
-//         userId: session?.twtrId,
-//         createdAt: {
-//           gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-//         },
-//       },
-//     });
-//   }
-//   console.log('twts', tweetlist);
-
-//   return {
-//     props: { tweetlist: JSON.parse(JSON.stringify(tweetlist)) },
-//   };
-// }
