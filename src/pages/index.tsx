@@ -95,13 +95,14 @@ export default function HomePage() {
     accessToken: session?.accessToken,
     twtrId: session?.twtrId,
   };
-  const { data: fetchedTweets } = useSWR(
+  const { data: fetchedTweets, error: fetchedTweetError } = useSWR(
     { url: '/api/twitter/fetch', args: fetchTweetArgs },
     fetchTweets
   );
-  if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-    console.log('fetchedTweets', fetchedTweets);
-  }
+  // if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+  console.log('fetchedTweets', fetchedTweetError);
+  console.log('fetchedTweets', fetchedTweets);
+  // }
 
   if (!session) {
     return (
