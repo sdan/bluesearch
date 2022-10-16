@@ -5,6 +5,8 @@ import Seo from '@/components/Seo';
 import { signIn, signOut, useSession, getSession } from 'next-auth/react';
 
 import useSWRMutation from 'swr/mutation';
+import useSWR from 'swr';
+
 import { PrismaClient } from '@prisma/client';
 import { Tweet } from 'react-static-tweets';
 
@@ -12,31 +14,81 @@ type Props = {
   tweetlist: any[];
 };
 
-export default function HomePage({ tweetlist }: Props) {
-  console.log('tweetlist front', tweetlist);
+export default function HomePage() {
   const { data: session } = useSession();
 
   type ApiRequest = {
-    arg: {
-      accessToken: any;
-      twtrId: any;
-    };
+    accessToken: any;
+    twtrId: any;
   };
-  async function sendRequest(url: any, arg: ApiRequest) {
-    console.log('access token fetcher', arg);
-    console.log('arg.accessToken', arg.arg.accessToken);
-    console.log('arg.twtrId', arg.arg.twtrId);
-    return fetch(url, {
-      headers: { 'Content-Type': 'application/json' },
+
+  function pullTweets(args: any) {
+    // console.log('access token fetcher', session?.accessToken, session?.twtrId);
+    // console.log('arg.accessToken', arg.accessToken);
+    // console.log('arg.twtrId', arg.twtrId);
+    console.log('PT args', args);
+    console.log('url', args.url);
+    return fetch(args.url, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        accessToken: arg.arg.accessToken,
-        twtrId: arg.arg.twtrId,
+        twtrId: args.args.twtrId,
       }),
-    });
+    }).then((res) => res.json());
   }
 
-  const { trigger } = useSWRMutation(['/api/twitter/fetch'], sendRequest);
+  function fetchTweets(args: any) {
+    // console.log('access token fetcher', session?.accessToken, session?.twtrId);
+    // console.log('arg.accessToken', arg.accessToken);
+    // console.log('arg.twtrId', arg.twtrId);
+    console.log('FT args', args);
+    console.log('url', args.url);
+    return fetch(args.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accessToken: args.args.accessToken,
+        twtrId: args.args.twtrId,
+      }),
+    }).then((res) => res.json());
+  }
+
+  // auto fetch from db and conditionally fetch/store tweets
+  // keep fetching from db
+
+  // initialize variable args as type ApiRequest
+  const pullTweetArgs: ApiRequest = {
+    accessToken: '',
+    twtrId: session?.twtrId,
+  };
+
+  console.log('session?.twtrId', session?.twtrId);
+  // const { data: twtrList } = useSWR(
+  //   ['/api/twitter/pull', session?.twtrId],
+  //   pullTweets
+  // );
+  const { data, error } = useSWR(
+    { url: '/api/twitter/pull', args: pullTweetArgs },
+    pullTweets
+  );
+  if (error) {
+    console.log('error', error);
+  }
+  if (data) {
+    console.log('tweetsFromDB', data[0]);
+  } else {
+    console.log('no data');
+  }
+
+  const fetchTweetArgs: ApiRequest = {
+    accessToken: session?.accessToken,
+    twtrId: session?.twtrId,
+  };
+  const { data: fetchedTweets } = useSWR(
+    { url: '/api/twitter/fetch', args: fetchTweetArgs },
+    fetchTweets
+  );
+  console.log('fetchedTweets', fetchedTweets);
 
   if (!session) {
     return (
@@ -46,7 +98,7 @@ export default function HomePage({ tweetlist }: Props) {
           <section className='bg-white'>
             <div className='layout flex min-h-screen flex-col items-center justify-center text-center text-black'>
               <h1 className='drop-shadow-glow animate-flicker text-4xl text-red-500 md:text-6xl'>
-                🦅🦅🦅 Tanager 🦅🦅🦅
+                🦅🦅🦅 🦅🦅🦅
               </h1>
               <br />
               <ButtonLink
@@ -86,7 +138,7 @@ export default function HomePage({ tweetlist }: Props) {
                   >
                     sign out
                   </ButtonLink>
-                  <ButtonLink
+                  {/* <ButtonLink
                     className='mt-6'
                     onClick={() =>
                       trigger({
@@ -98,13 +150,13 @@ export default function HomePage({ tweetlist }: Props) {
                     href={''}
                   >
                     fetch tweets
-                  </ButtonLink>
+                  </ButtonLink> */}
                 </>
               </p>
 
-              {tweetlist ? (
+              {data ? (
                 <ul>
-                  {tweetlist.map((value: any, index: any) => {
+                  {data.map((value: any, index: any) => {
                     return (
                       <>
                         <li key={index}>
@@ -126,32 +178,32 @@ export default function HomePage({ tweetlist }: Props) {
   }
 }
 
-export async function getServerSideProps({ req, res }: any) {
-  const session = await getSession({ req });
-  console.log('index session', session);
-  console.log('index session.accessToken', session?.accessToken);
-  console.log('index session.twtrId', session?.twtrId);
-  let tweetlist: any = [];
-  if (session && session.twtrId) {
-    console.log("session exists and user's twitter id exists");
-    const prisma = new PrismaClient();
+// export async function getServerSideProps({ req, res }: any) {
+//   const session = await getSession({ req });
+//   console.log('index session', session);
+//   console.log('index session.accessToken', session?.accessToken);
+//   console.log('index session.twtrId', session?.twtrId);
+//   let tweetlist: any = [];
+//   if (session && session.twtrId) {
+//     console.log("session exists and user's twitter id exists");
+//     const prisma = new PrismaClient();
 
-    //find tweets by user id and sort by likes in descending order (most likes first) for the past 24 hours
-    tweetlist = await prisma.tweet.findMany({
-      orderBy: {
-        likes: 'desc',
-      },
-      where: {
-        userId: session?.twtrId,
-        createdAt: {
-          gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-        },
-      },
-    });
-  }
-  console.log('twts', tweetlist);
+//     //find tweets by user id and sort by likes in descending order (most likes first) for the past 24 hours
+//     tweetlist = await prisma.tweet.findMany({
+//       orderBy: {
+//         likes: 'desc',
+//       },
+//       where: {
+//         userId: session?.twtrId,
+//         createdAt: {
+//           gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+//         },
+//       },
+//     });
+//   }
+//   console.log('twts', tweetlist);
 
-  return {
-    props: { tweetlist: JSON.parse(JSON.stringify(tweetlist)) },
-  };
-}
+//   return {
+//     props: { tweetlist: JSON.parse(JSON.stringify(tweetlist)) },
+//   };
+// }

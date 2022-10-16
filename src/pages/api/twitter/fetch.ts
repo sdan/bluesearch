@@ -6,6 +6,7 @@ type Tweet = components['schemas']['Tweet'];
 const prisma = new PrismaClient();
 
 export default async function handle(req: any, res: any) {
+  console.log('in api fetch');
   console.log('req.body', req.body);
   const { accessToken, twtrId } = req.body;
   const tClient = new Client(accessToken);
@@ -21,6 +22,7 @@ export default async function handle(req: any, res: any) {
 
 export async function FetchTweets(tClient: Client, twtrId: string) {
   let numTweets = 0;
+  let insertedTweet: any;
   let twt: Tweet;
 
   const getUsersTimeline = tClient.tweets.usersIdTimeline(twtrId, {
@@ -44,7 +46,7 @@ export async function FetchTweets(tClient: Client, twtrId: string) {
       // console.log('retweets:', twt.public_metrics?.retweet_count);
       // console.log('time: ', twt.created_at);
       // console.log('entities: ', twt.entities);
-      await StoreTweet(prisma, twt, twtrId);
+      insertedTweet = await StoreTweet(prisma, twt, twtrId);
     }
     numTweets += page?.meta?.result_count || 0;
   }

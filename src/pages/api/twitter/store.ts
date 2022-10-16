@@ -38,4 +38,5 @@ export async function StoreTweet(
     },
   });
   console.log('tweet inserted', twt);
+  return twt;
 }

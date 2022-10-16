@@ -25,8 +25,8 @@ export default NextAuth({
       return true;
     },
     async jwt({ token, account }) {
-      console.log('JWT token', token);
-      console.log('JWT account', account);
+      // console.log('JWT token', token);
+      // console.log('JWT account', account);
       if (account) {
         token.accessToken = account.access_token;
         console.log('JWT account.accessToken', token.accessToken);
@@ -44,9 +44,9 @@ export default NextAuth({
       return token;
     },
     async session({ session, token, user }) {
-      console.log('SS SESSSION', session);
-      console.log('SS TTTOOKKKEN', token);
-      console.log('SS USER', user);
+      // console.log('SS SESSSION', session);
+      // console.log('SS TTTOOKKKEN', token);
+      // console.log('SS USER', user);
       const tClient = new Client(String(token.accessToken));
       console.log('SS TOKENACCESS', String(token.accessToken));
 

@@ -79,14 +79,14 @@ export default function Seo(props: SeoProps) {
       )}
 
       {/* Favicons */}
-      {favicons.map((linkProps) => (
+      {/* {favicons.map((linkProps) => (
         <link key={linkProps.href} {...linkProps} />
       ))}
       <meta name='msapplication-TileColor' content='#ffffff' />
       <meta
         name='msapplication-TileImage'
         content='/favicon/ms-icon-144x144.png'
-      />
+      /> */}
       <meta name='theme-color' content='#ffffff' />
     </Head>
   );
