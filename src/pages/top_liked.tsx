@@ -100,7 +100,7 @@ export default function HomePage() {
     fetchTweets
   );
   // if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-  console.log('fetchedTweets', fetchedTweetError);
+  console.log('fetchedTweet Error', fetchedTweetError);
   console.log('fetchedTweets', fetchedTweets);
   // }
 
