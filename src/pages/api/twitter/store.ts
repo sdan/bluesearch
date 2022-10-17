@@ -37,6 +37,6 @@ export async function StoreTweet(
       },
     },
   });
-  console.log('tweet inserted', twt);
+  console.log('tweet inserted', twt.id);
   return twt;
 }

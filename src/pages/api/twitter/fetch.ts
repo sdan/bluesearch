@@ -9,16 +9,24 @@ export default async function handle(req: any, res: any) {
   console.log('in api fetch');
   console.log('req.body', req.body);
   const { accessToken, twtrId } = req.body;
-  const tClient = new Client(accessToken);
 
-  console.log('api route twitter', accessToken);
+  try {
+    if (!accessToken && !twtrId) {
+      throw new Error('No access token or twitter id');
+    }
+    const tClient = new Client(accessToken);
 
-  console.log('twtr ID', twtrId);
+    console.log('api route twitter', accessToken);
 
-  const data = await FetchTweets(tClient, twtrId);
-  console.log('numTweets', data);
+    console.log('twtr ID', twtrId);
 
-  res.status(200).json({ data });
+    const data = await FetchTweets(tClient, twtrId);
+    console.log('numTweets', data);
+    res.status(200).json({ data });
+  } catch (err) {
+    console.log('fetch err', err);
+    res.status(500).json({ error: err });
+  }
 }
 
 export async function FetchTweets(tClient: Client, twtrId: string) {
@@ -40,7 +48,7 @@ export async function FetchTweets(tClient: Client, twtrId: string) {
 
   for await (const page of getUsersTimeline) {
     for (twt of page.data ?? []) {
-      console.log('Tweet: ', twt.text);
+      console.log('tweet id: ', twt.id);
       // console.log('author: ', twt.author_id);
       // console.log('id: ', twt.id);
       console.log('likes:', twt.public_metrics?.like_count);
