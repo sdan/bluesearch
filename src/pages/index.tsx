@@ -6,6 +6,7 @@ import { signIn, signOut, useSession, getSession } from 'next-auth/react';
 
 export default function HomePage() {
   const { data: session } = useSession();
+  console.log('SESS hello', process.env.HELLO);
   if (!session) {
     return (
       <Layout>
