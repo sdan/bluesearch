@@ -118,8 +118,6 @@ export default function HomePage() {
             </p>
             <p className='mt-2 text-sm text-gray-700'>
               <>
-                <h2>welcome {session!.user?.name}</h2>
-
                 <ButtonLink
                   className='mt-6'
                   onClick={() => signOut()}
