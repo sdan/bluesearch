@@ -15,9 +15,10 @@ export default async function handle(req: any, res: any) {
 
   console.log('twtr ID', twtrId);
 
-  await FetchTweets(tClient, twtrId);
+  const data = await FetchTweets(tClient, twtrId);
+  console.log('numTweets', data);
 
-  res.status(200).json({ fuck: 'you' });
+  res.status(200).json({ data });
 }
 
 export async function FetchTweets(tClient: Client, twtrId: string) {
@@ -50,5 +51,7 @@ export async function FetchTweets(tClient: Client, twtrId: string) {
     }
     numTweets += page?.meta?.result_count || 0;
   }
+
   console.log('cumtweets:', numTweets);
+  return numTweets;
 }
