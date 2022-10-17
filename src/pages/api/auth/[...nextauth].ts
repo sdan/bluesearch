@@ -15,6 +15,7 @@ export default NextAuth({
       version: '2.0',
     }),
   ],
+  secret: 'IaSarwO/qqCDxVg12h/fWcYlDnqGlSOtI4sUwtwST54=',
   callbacks: {
     async signIn({ user, account, profile }) {
       console.log('SI user', user);
