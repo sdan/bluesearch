@@ -34,10 +34,11 @@ export default function HomePage() {
     console.log('sendRequest url', url);
     console.log('sendRequest args', args);
     refreshSession();
-    if (!session || !session.accessToken) {
-      setUserError('Please sign in');
-      signOut();
-    }
+    // if (!session || !session.accessToken) {
+    //   console.log('signed out');
+    //   setUserError('Please sign in');
+    //   signOut();
+    // }
 
     console.log('sendRequest session', session?.accessToken);
     if (args.arg && session && session.accessToken) {
@@ -118,22 +119,20 @@ export default function HomePage() {
                   <p className='mt-2 text-sm text-red-800'>{userError}</p>
                 )}
 
-                {data &&
-                  data.data &&
-                  data.data[0].id(
-                    <ul>
-                      {data.data.map((value: any, index: any) => {
-                        return (
-                          <>
-                            <li key={index}>
-                              <Tweet id={value.id} />
-                            </li>
-                            <br></br>
-                          </>
-                        );
-                      })}
-                    </ul>
-                  )}
+                {data && data.data && (
+                  <ul>
+                    {data.data.map((value: any, index: any) => {
+                      return (
+                        <>
+                          <li key={index}>
+                            <Tweet id={value.id} />
+                          </li>
+                          <br></br>
+                        </>
+                      );
+                    })}
+                  </ul>
+                )}
               </>
             </p>
           </div>
