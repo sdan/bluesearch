@@ -16,6 +16,7 @@ export default async function handler(
       const { authorization } = req.headers;
 
       if (authorization === `Bearer ${process.env.CRON_SECRET_KEY}`) {
+        console.log('cron job running');
         UpdateTimeline();
         res.status(200).json({ success: true });
       } else {
@@ -41,6 +42,7 @@ export async function UpdateTimeline() {
   for (const user of userlist) {
     const accessToken = user.providerAccountId;
     const tClient = new Client(accessToken);
+    console.log('fetching tweets', user.providerAccountId);
     FetchTweets(tClient, accessToken);
   }
 }
