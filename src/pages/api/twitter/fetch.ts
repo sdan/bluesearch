@@ -34,6 +34,8 @@ export async function FetchTweets(tClient: Client, twtrId: string) {
   let insertedTweet: any;
   let twt: Tweet;
 
+  console.log('in fetch tweets', twtrId);
+
   const getUsersTimeline = tClient.tweets.usersIdTimeline(twtrId, {
     max_results: 100,
     start_time: new Date(Date.now() - 86400000).toISOString(),
