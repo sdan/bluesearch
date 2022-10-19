@@ -5,8 +5,7 @@ import Seo from '@/components/Seo';
 import { signIn, signOut, useSession, getSession } from 'next-auth/react';
 
 import useSWRMutation from 'swr/mutation';
-import useSWR from 'swr';
-
+import useSWRImmutable from 'swr/immutable';
 import { PrismaClient } from '@prisma/client';
 import { Tweet } from 'react-static-tweets';
 
@@ -14,95 +13,68 @@ type Props = {
   tweetlist: any[];
 };
 
+export function refreshSession() {
+  const message = { event: 'session', data: { trigger: 'getSession' } };
+  localStorage.setItem(
+    'nextauth.message',
+    JSON.stringify({ ...message, timestamp: Math.floor(Date.now() / 1000) })
+  );
+}
+
 export default function HomePage() {
   const { data: session } = useSession();
 
-  type ApiRequest = {
-    accessToken: any;
-    twtrId: any;
-  };
+  const [userError, setUserError] = React.useState('');
 
-  function pullTweets(args: any) {
-    // console.log('access token fetcher', session?.accessToken, session?.twtrId);
-    // console.log('arg.accessToken', arg.accessToken);
-    // console.log('arg.twtrId', arg.twtrId);
-    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('PT args', args);
-      console.log('url', args.url);
+  //inputtweetid react state of type Input
+  //   const [inputTweetId, setInputTweetId] = React.useState('');
+  const inputTweetId = '';
+
+  async function sendRequest(url: any, args: any) {
+    console.log('sendRequest url', url);
+    console.log('sendRequest args', args);
+    refreshSession();
+    if (!session || !session.accessToken) {
+      setUserError('Please sign in');
+      signOut();
     }
-    return fetch(args.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        twtrId: args.args.twtrId,
-      }),
-    }).then((res) => res.json());
-  }
 
-  function fetchTweets(args: any) {
-    // console.log('access token fetcher', session?.accessToken, session?.twtrId);
-    // console.log('arg.accessToken', arg.accessToken);
-    // console.log('arg.twtrId', arg.twtrId);
-    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('FT args', args);
-      console.log('url', args.url);
+    console.log('sendRequest session', session?.accessToken);
+    if (args.arg && session && session.accessToken) {
+      const fetchQuote = await fetch('/api/twitter/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accessToken: session.accessToken,
+          tweetId: args.arg,
+        }),
+      });
+      const quoteData = await fetchQuote.json();
+      console.log('quote fetch data', quoteData);
+      return quoteData;
+    } else {
+      console.log('no args');
+      setUserError('try signing again');
     }
-    return fetch(args.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        accessToken: args.args.accessToken,
-        twtrId: args.args.twtrId,
-      }),
-    }).then((res) => res.json());
   }
 
-  // auto fetch from db and conditionally fetch/store tweets
-  // keep fetching from db
+  //   const { data, error } = useSWRImmutable(
+  //     { url: '/api/twitter/quote', args: inputTweetId },
+  //     sendRequest
+  //   );
 
-  // initialize variable args as type ApiRequest
-  const pullTweetArgs: ApiRequest = {
-    accessToken: '',
-    twtrId: session?.twtrId,
-  };
-  if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-    console.log('session?.twtrId', session?.twtrId);
-  }
-  // const { data: twtrList } = useSWR(
-  //   ['/api/twitter/pull', session?.twtrId],
-  //   pullTweets
-  // );
-  const { data, error } = useSWR(
-    { url: '/api/twitter/pull', args: pullTweetArgs },
-    pullTweets
+  const { data, trigger, error } = useSWRMutation(
+    ['/api/twitter/quote', inputTweetId],
+    sendRequest
   );
+
   if (error) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('error', error);
-    }
-  }
-  if (data) {
-    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('tweetsFromDB', data[0]);
-    }
-  } else {
-    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('no data');
+      console.log('useSwr error', error);
     }
   }
 
-  const fetchTweetArgs: ApiRequest = {
-    accessToken: session?.accessToken,
-    twtrId: session?.twtrId,
-  };
-  const { data: fetchedTweets, error: fetchedTweetError } = useSWR(
-    { url: '/api/twitter/fetch', args: fetchTweetArgs },
-    fetchTweets
-  );
-  // if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-  console.log('fetchedTweets', fetchedTweetError);
-  console.log('fetchedTweets', fetchedTweets);
-  // }
+  console.log('quote swr data', data);
 
   return (
     <Layout>
@@ -112,52 +84,58 @@ export default function HomePage() {
       <main>
         <section className='bg-white'>
           <div className='layout flex min-h-screen flex-col items-center justify-center text-center'>
-            <h1 className='mt-4'>🐥🐥🐥 **still in progress** 🐥🐥🐥</h1>
+            <h1 className='mt-4'>🐥🐥🐥 Tanager 🐥🐥🐥</h1>
             <p className='mt-2 text-sm text-gray-800'>
               Top liked quote tweets{' '}
             </p>
             <p className='mt-2 text-sm text-gray-700'>
               <>
-                <ButtonLink
+                {/* <ButtonLink
                   className='mt-6'
                   onClick={() => signOut()}
                   variant='light'
                   href={''}
                 >
                   sign out
-                </ButtonLink>
-                {/* <ButtonLink
-                    className='mt-6'
-                    onClick={() =>
-                      trigger({
-                        accessToken: session.accessToken!,
-                        twtrId: session.twtrId!,
-                      })
-                    }
-                    variant='dark'
-                    href={''}
-                  >
-                    fetch tweets
-                  </ButtonLink> */}
+                </ButtonLink> */}
+                {/* input that takes tweet link and fetches all quote tweets */}
+
+                <input
+                  type='text'
+                  placeholder='tweet link'
+                  name='tweet'
+                  //   onChange={(e) => {
+                  //     sendRequest({
+                  //       tweetId: e.target.value,
+                  //       accessToken: session?.accessToken,
+                  //     });
+                  //   }}
+                  onChange={(e) => {
+                    trigger(e.target.value);
+                  }}
+                />
+                {error && (
+                  <p className='mt-2 text-sm text-red-800'>{userError}</p>
+                )}
+
+                {data &&
+                  data.data &&
+                  data.data[0].id(
+                    <ul>
+                      {data.data.map((value: any, index: any) => {
+                        return (
+                          <>
+                            <li key={index}>
+                              <Tweet id={value.id} />
+                            </li>
+                            <br></br>
+                          </>
+                        );
+                      })}
+                    </ul>
+                  )}
               </>
             </p>
-
-            {data ? (
-              <ul>
-                {data.map((value: any, index: any) => {
-                  return (
-                    <>
-                      <li key={index}>
-                        <Tweet id={value.id} />
-                      </li>
-                      <br></br>
-                    </>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p>no tweets</p>
-            )}
           </div>
         </section>
       </main>
