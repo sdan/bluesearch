@@ -44,7 +44,7 @@ export async function QuoteTweets(tClient: Client, tweetId: string) {
   let numTweets = 0;
   const getQuoteTweets = tClient.tweets.findTweetsThatQuoteATweet(tweetId, {
     max_results: 100,
-    exclude: ['retweets'],
+    exclude: ['retweets', 'replies'],
     'tweet.fields': [
       'author_id',
       'geo',
