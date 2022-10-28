@@ -3,8 +3,9 @@ import { components } from 'twitter-api-sdk/dist/types';
 type Tweet = components['schemas']['Tweet'];
 const prisma = new PrismaClient();
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Client } from 'twitter-api-sdk';
-import { FetchTweets } from './fetch';
+import Client, { auth } from 'twitter-api-sdk';
+import { StoreTweet } from './store';
+import { RefreshTokens } from './token';
 // pages/api/cron.ts
 
 export default async function handler(
@@ -17,7 +18,7 @@ export default async function handler(
 
       if (authorization === `Bearer ${process.env.CRON_SECRET_KEY}`) {
         console.log('cron job running');
-        UpdateTimeline();
+        await UpdateTimeline();
         res.status(200).json({ success: true });
       } else {
         res.status(401).json({ success: false });
@@ -37,6 +38,7 @@ export async function UpdateTimeline() {
     select: {
       providerAccountId: true,
       access_token: true,
+      refresh_token: true,
     },
   });
 
@@ -45,18 +47,37 @@ export async function UpdateTimeline() {
   for (const user of userlist) {
     const accessToken = user.access_token!;
     console.log('accessToken', accessToken);
+    const twtrId = user.providerAccountId!;
+    console.log('fetching tweets', twtrId);
 
-    console.log('fetching tweets', user.providerAccountId);
-    // const data = await FetchTweets(tClient, user.providerAccountId);
+    const authClient = new auth.OAuth2User({
+      client_id: process.env.TWITTER_CLIENT_ID!,
+      client_secret: process.env.TWITTER_CLIENT_SECRET!,
+      callback: 'http://tanager.app/api/auth/callback/twitter',
+      scopes: [],
+      token: {
+        access_token: accessToken,
+        refresh_token: user.refresh_token!,
+      },
+    });
 
-    const uAccessToken = '800117847774986240-sI3Ghob3UxSFqXgTDDrGrA1OcmGZMcq';
-    const uTwtrId = '800117847774986240';
+    const tClient = new Client(authClient);
 
-    const tClient = new Client(uAccessToken);
-    const myself = await tClient.users.findMyUser();
-    console.log('myself', myself);
+    // Verify refresh token is still valid
+    try {
+      const isValid = await tClient.users.findMyUser();
+    } catch (err) {
+      console.log('Stores refresh token expired', err);
+      try {
+        const newTokens = await RefreshTokens(twtrId, user.refresh_token!);
+      } catch (err) {
+        console.log('Failed to refresh tokens', err);
+        // Throw fatal error and stop cron job
+        throw new Error('Failed to generate refresh tokens');
+      }
+    }
 
-    const getUsersTimeline = tClient.tweets.usersIdTimeline(uTwtrId, {
+    const getUsersTimeline = tClient.tweets.usersIdTimeline(twtrId, {
       max_results: 100,
       start_time: new Date(Date.now() - 86400000).toISOString(),
       'tweet.fields': [
@@ -81,7 +102,7 @@ export async function UpdateTimeline() {
         // console.log('retweets:', twt.public_metrics?.retweet_count);
         // console.log('time: ', twt.created_at);
         // console.log('entities: ', twt.entities);
-        // insertedTweet = await StoreTweet(prisma, twt, twtrId);
+        insertedTweet = await StoreTweet(prisma, twt, twtrId);
       }
       numTweets += page?.meta?.result_count || 0;
     }
