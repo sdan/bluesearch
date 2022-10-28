@@ -23,16 +23,23 @@ export default NextAuth({
       // Insert refresh token into database
       const { providerAccountId, access_token, refresh_token } = account;
 
-      const data = await prisma.account.update({
-        where: {
-          providerAccountId: providerAccountId,
-        },
-        data: {
-          access_token: access_token,
-          refresh_token: refresh_token,
-        },
-      });
-      console.log('SI data', data);
+      try {
+        const data = await prisma.account.update({
+          where: {
+            providerAccountId: providerAccountId,
+          },
+          data: {
+            access_token: access_token,
+            refresh_token: refresh_token,
+          },
+        });
+        console.log('SI data', data);
+      } catch (err) {
+        console.log(
+          'updating account not possible. account probably does not exist: ',
+          err
+        );
+      }
 
       console.log('SI profile', profile);
       return true;
