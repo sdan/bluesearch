@@ -47,6 +47,8 @@ export async function UpdateTimeline() {
   for (const user of userlist) {
     const accessToken = user.access_token!;
     console.log('accessToken', accessToken);
+    const refreshToken = user.refresh_token!;
+    console.log('refreshToken', refreshToken);
     const twtrId = user.providerAccountId!;
     console.log('fetching tweets', twtrId);
 
@@ -57,7 +59,7 @@ export async function UpdateTimeline() {
       scopes: [],
       token: {
         access_token: accessToken,
-        refresh_token: user.refresh_token!,
+        refresh_token: refreshToken,
       },
     });
 
@@ -68,13 +70,7 @@ export async function UpdateTimeline() {
       const isValid = await tClient.users.findMyUser();
     } catch (err) {
       console.log('Stores refresh token expired', err);
-      try {
-        const newTokens = await RefreshTokens(twtrId, user.refresh_token!);
-      } catch (err) {
-        console.log('Failed to refresh tokens', err);
-        // Throw fatal error and stop cron job
-        throw new Error('Failed to generate refresh tokens');
-      }
+      throw new Error('Failed to generate refresh tokens');
     }
 
     const getUsersTimeline = tClient.tweets.usersIdTimeline(twtrId, {
