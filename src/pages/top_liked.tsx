@@ -104,27 +104,17 @@ export default function HomePage() {
   console.log('fetchedTweets', fetchedTweets);
   // }
 
+  // Design the Top Liked Tweets page with the tweets from the database with a similar style to the rest of the site. Make sure to include a loading state and error state. You can use the `useSWR` hook to fetch the data from the database.
   if (!session) {
     return (
       <Layout>
-        <Seo templateTitle='Home' />
-        <main>
-          <section className='bg-white'>
-            <div className='layout flex min-h-screen flex-col items-center justify-center text-center text-black'>
-              <h1 className='drop-shadow-glow animate-flicker text-4xl text-red-500 md:text-6xl'>
-                🐥🐥🐥 🐥🐥🐥
-              </h1>
-              <br />
-              <ButtonLink
-                className='mt-4 md:text-lg'
-                onClick={() => signIn('twitter')}
-                href={''}
-              >
-                Sign In
-              </ButtonLink>
-            </div>
-          </section>
-        </main>
+        <Seo title='Top Liked Tweets' />
+        <div className='flex min-h-screen flex-col items-center justify-center py-2'>
+          <p className='text-4xl font-bold'>Top Liked Tweets</p>
+          <p className='mt-4 text-xl text-gray-500'>
+            You must be signed in to view this page.
+          </p>
+        </div>
       </Layout>
     );
   } else {
@@ -132,61 +122,33 @@ export default function HomePage() {
       <Layout>
         <Seo templateTitle='Home' />
         <Seo />
-
-        <main>
-          <section className='bg-white'>
-            <div className='layout flex min-h-screen flex-col items-center justify-center text-center'>
-              <h1 className='mt-4'>🐥🐥🐥 Tanager 🐥🐥🐥</h1>
-              <p className='mt-2 text-sm text-gray-800'>
-                Tweets from the past 24h sorted by likes{' '}
-              </p>
-              <p className='mt-2 text-sm text-gray-700'>
-                <>
-                  <h2>welcome {session!.user?.name}</h2>
-
-                  <ButtonLink
-                    className='mt-6'
-                    onClick={() => signOut()}
-                    variant='light'
-                    href={''}
-                  >
-                    sign out
-                  </ButtonLink>
-                  {/* <ButtonLink
-                    className='mt-6'
-                    onClick={() =>
-                      trigger({
-                        accessToken: session.accessToken!,
-                        twtrId: session.twtrId!,
-                      })
-                    }
-                    variant='dark'
-                    href={''}
-                  >
-                    fetch tweets
-                  </ButtonLink> */}
-                </>
-              </p>
-
-              {data ? (
-                <ul>
-                  {data.map((value: any, index: any) => {
-                    return (
-                      <>
-                        <li key={index}>
-                          <Tweet id={value.id} />
-                        </li>
-                        <br></br>
-                      </>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p>no tweets</p>
-              )}
-            </div>
-          </section>
-        </main>
+        <div className='flex min-h-screen flex-col items-center justify-center py-2'>
+          <p className='text-4xl font-bold'>Top Liked Tweets</p>
+          <p className='mt-4 text-xl text-gray-500'>
+            Here are your top liked tweets.
+          </p>
+          <div className='mt-4'>
+            <ButtonLink
+              href='/'
+              className='block rounded-md bg-blue-500 px-4 py-2 text-center text-white hover:bg-blue-600'
+            >
+              Back
+            </ButtonLink>
+          </div>
+          <div className='mt-4'>
+            {data ? (
+              data.map((tweet: any) => (
+                <Tweet
+                  key={tweet.id}
+                  id={tweet.id}
+                  className='mt-4 rounded-md border border-gray-300 p-4'
+                />
+              ))
+            ) : (
+              <p>Loading...</p>
+            )}
+          </div>
+        </div>
       </Layout>
     );
   }
