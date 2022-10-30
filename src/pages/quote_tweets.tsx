@@ -86,7 +86,8 @@ export default function HomePage() {
                 Top liked quote tweets
               </h1>
               <p className='mt-4 md:text-lg'>
-                Enter a tweet id to get a quote tweet
+                Enter a link to a tweet to get a list of quote tweets ordered by
+                likes
               </p>
 
               <p className='mt-2 text-sm text-gray-700'>
