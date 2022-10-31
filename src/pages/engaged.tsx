@@ -68,9 +68,12 @@ export default function HomePage() {
   if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
     console.log('session?.twtrId', session?.twtrId);
   }
-
+  // const { data: twtrList } = useSWR(
+  //   ['/api/twitter/pull', session?.twtrId],
+  //   pullTweets
+  // );
   const { data, error } = useSWR(
-    { url: '/api/twitter/top_liked/pull', args: pullTweetArgs },
+    { url: '/api/twitter/pull', args: pullTweetArgs },
     pullTweets
   );
   if (error) {
@@ -93,7 +96,7 @@ export default function HomePage() {
     twtrId: session?.twtrId,
   };
   const { data: fetchedTweets, error: fetchedTweetError } = useSWR(
-    { url: '/api/twitter/top_liked/fetch', args: fetchTweetArgs },
+    { url: '/api/twitter/fetch', args: fetchTweetArgs },
     fetchTweets
   );
   // if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
@@ -120,9 +123,9 @@ export default function HomePage() {
         <Seo templateTitle='Home' />
         <Seo />
         <div className='flex min-h-screen flex-col items-center justify-center py-2'>
-          <p className='text-4xl font-bold'>Top Liked Tweets</p>
+          <p className='text-4xl font-bold'>Most engaged people</p>
           <p className='mt-4 text-xl text-gray-500'>
-            Here are your top liked tweets.
+            Here are the people you frequently engage with on Twitter
           </p>
           <div className='mt-4'>
             <ButtonLink

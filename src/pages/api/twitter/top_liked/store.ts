@@ -35,6 +35,7 @@ export async function StoreTweet(
           providerAccountId,
         },
       },
+      userLikes: {},
     },
   });
   console.log('tweet inserted', twt.id);

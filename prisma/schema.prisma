@@ -25,7 +25,8 @@ model Account {
   session_state String?
 
   user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Tweet Tweet[]
+  Tweet Tweet[] @relation("Timeline")
+  LikedTweets Tweet[] @relation("LikedTweets")
 
   @@unique([provider, providerAccountId])
 }
@@ -66,8 +67,8 @@ model Tweet {
   createdAt DateTime
   userId    String
 
-  user Account @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
-
-  // account    Account     @relation(fields: [id], references: [providerAccountId])
+  user Account @relation("Timeline", fields: [userId], references: [providerAccountId], onDelete: Cascade, map: "Tweet_timelin_fkey")
+  // Use Tweet model to store list of the users liked tweets
+  userLikes Account @relation("LikedTweets", fields: [userId], references: [providerAccountId], onDelete: Cascade, map: "Tweet_likedtweets_fkey")
   @@unique([id])
 }
