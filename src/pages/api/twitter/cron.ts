@@ -4,7 +4,7 @@ type Tweet = components['schemas']['Tweet'];
 const prisma = new PrismaClient();
 import { NextApiRequest, NextApiResponse } from 'next';
 import Client, { auth } from 'twitter-api-sdk';
-import { StoreTweet } from './store';
+import { StoreTweet } from './top_liked/store';
 import { RefreshTokens } from './token';
 // pages/api/cron.ts
 

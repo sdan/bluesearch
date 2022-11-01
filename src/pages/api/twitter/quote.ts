@@ -3,7 +3,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { Client } from 'twitter-api-sdk';
-import { StoreTweet } from './store';
 import { components } from 'twitter-api-sdk/dist/types';
 type Tweet = components['schemas']['Tweet'];
 export default async function handle(req: any, res: any) {

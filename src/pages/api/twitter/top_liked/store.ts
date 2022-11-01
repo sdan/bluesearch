@@ -1,5 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { components } from 'twitter-api-sdk/dist/types';
@@ -15,29 +13,31 @@ export async function StoreTweet(
   providerAccountId: any
 ) {
   console.log('tweets in storetweets');
-  const twt = await pc.tweet.upsert({
+
+  const twt = await pc.account.update({
     where: {
-      id: tweetData.id,
+      providerAccountId: providerAccountId,
     },
-    update: {
-      likes: tweetData.public_metrics?.like_count,
-    },
-    create: {
-      id: tweetData.id,
-      author: tweetData.author_id!,
-      text: tweetData.text,
-      likes: tweetData.public_metrics?.like_count,
-      retweets: tweetData.public_metrics?.retweet_count,
-      entities: tweetData.entities,
-      createdAt: tweetData.created_at!,
-      user: {
-        connect: {
-          providerAccountId,
+    data: {
+      TimelineTweets: {
+        connectOrCreate: {
+          where: {
+            id: tweetData.id,
+          },
+          create: {
+            id: tweetData.id,
+            author: tweetData.author_id!,
+            text: tweetData.text,
+            likes: tweetData.public_metrics?.like_count,
+            retweets: tweetData.public_metrics?.retweet_count,
+            entities: tweetData.entities,
+            createdAt: tweetData.created_at!,
+          },
         },
       },
-      userLikes: {},
     },
   });
-  console.log('tweet inserted', twt.id);
+
+  console.log('tweet inserted', tweetData.id);
   return twt;
 }

@@ -20,24 +20,36 @@ export async function PullTweets(twtrId: any) {
   const prisma = new PrismaClient();
 
   //find tweets by user id and sort by likes in descending order (most likes first) for the past 24 hours
-  tweetlist = await prisma.account.findFirst({
+  //   tweetlist = await prisma.tweet.findMany({
+  //     orderBy: {
+  //       likes: 'desc',
+  //     },
+  //     where: {
+  //       userId: twtrId,
+  //       name: 'LikedTweets',
+  //       createdAt: {
+  //         gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+  //       },
+  //     },
+  //   });
+
+  // find userLikes by user id and sort by likes in descending order (most likes first) for the past 24 hours
+  tweetlist = await prisma.account.findMany({
     where: {
-      providerAccountId: twtrId,
+      userId: twtrId,
     },
-    select: {
-      TimelineTweets: {
-        orderBy: {
-          likes: 'desc',
-        },
+    include: {
+      LikedTweets: {
         where: {
           createdAt: {
-            // Last day
-            gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+            // Last week
+            gte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000),
           },
         },
       },
     },
   });
+
   console.log('twtrId in API', twtrId);
   console.log('twts', tweetlist[0]);
 

@@ -96,12 +96,29 @@ export default function HomePage() {
     { url: '/api/twitter/top_liked/fetch', args: fetchTweetArgs },
     fetchTweets
   );
+  if (fetchedTweetError) {
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('fetchedTweetError', fetchedTweetError);
+    }
+  }
+  if (fetchedTweets) {
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('fetchedTweets', fetchedTweets);
+    }
+  } else {
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('no fetchedTweets');
+    }
+  }
+
   // if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
   console.log('fetchedTweet Error', fetchedTweetError);
   console.log('fetchedTweets', fetchedTweets);
   // }
 
   // Design the Top Liked Tweets page with the tweets from the database with a similar style to the rest of the site. Make sure to include a loading state and error state. You can use the `useSWR` hook to fetch the data from the database.
+  // Include a refresh button that will fetch the latest tweets from the Twitter API and update the database. You can use the `useSWRMutation` hook to update the database.
+
   if (!session) {
     return (
       <Layout>
@@ -115,6 +132,7 @@ export default function HomePage() {
       </Layout>
     );
   } else {
+    console.log('dataWHAT', data);
     return (
       <Layout>
         <Seo templateTitle='Home' />
@@ -133,8 +151,16 @@ export default function HomePage() {
             </ButtonLink>
           </div>
           <div className='mt-4'>
+            <ButtonLink
+              href='/top_liked'
+              className='block rounded-md bg-blue-500 px-4 py-2 text-center text-white hover:bg-blue-600'
+            >
+              Refresh
+            </ButtonLink>
+          </div>
+          <div className='mt-4'>
             {data ? (
-              data.map((tweet: any) => (
+              data.TimelineTweets.map((tweet: any) => (
                 <Tweet
                   key={tweet.id}
                   id={tweet.id}

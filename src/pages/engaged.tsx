@@ -22,7 +22,7 @@ export default function HomePage() {
     twtrId: any;
   };
 
-  function pullTweets(args: any) {
+  function pullStats(args: any) {
     // console.log('access token fetcher', session?.accessToken, session?.twtrId);
     // console.log('arg.accessToken', arg.accessToken);
     // console.log('arg.twtrId', arg.twtrId);
@@ -39,7 +39,7 @@ export default function HomePage() {
     }).then((res) => res.json());
   }
 
-  function fetchTweets(args: any) {
+  function fetchLikes(args: any) {
     // console.log('access token fetcher', session?.accessToken, session?.twtrId);
     // console.log('arg.accessToken', arg.accessToken);
     // console.log('arg.twtrId', arg.twtrId);
@@ -61,20 +61,16 @@ export default function HomePage() {
   // keep fetching from db
 
   // initialize variable args as type ApiRequest
-  const pullTweetArgs: ApiRequest = {
+  const pullLikesArgs: ApiRequest = {
     accessToken: '',
     twtrId: session?.twtrId,
   };
   if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
     console.log('session?.twtrId', session?.twtrId);
   }
-  // const { data: twtrList } = useSWR(
-  //   ['/api/twitter/pull', session?.twtrId],
-  //   pullTweets
-  // );
   const { data, error } = useSWR(
-    { url: '/api/twitter/pull', args: pullTweetArgs },
-    pullTweets
+    { url: '/api/twitter/engagement/pull', args: pullLikesArgs },
+    pullStats
   );
   if (error) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
@@ -96,8 +92,8 @@ export default function HomePage() {
     twtrId: session?.twtrId,
   };
   const { data: fetchedTweets, error: fetchedTweetError } = useSWR(
-    { url: '/api/twitter/fetch', args: fetchTweetArgs },
-    fetchTweets
+    { url: '/api/twitter/engagement/fetch', args: fetchTweetArgs },
+    fetchLikes
   );
   // if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
   console.log('fetchedTweet Error', fetchedTweetError);
@@ -108,9 +104,9 @@ export default function HomePage() {
   if (!session) {
     return (
       <Layout>
-        <Seo title='Top Liked Tweets' />
+        <Seo title='Most engaged people' />
         <div className='flex min-h-screen flex-col items-center justify-center py-2'>
-          <p className='text-4xl font-bold'>Top Liked Tweets</p>
+          <p className='text-4xl font-bold'>Most engaged people</p>
           <p className='mt-4 text-xl text-gray-500'>
             You must be signed in to view this page.
           </p>
@@ -135,19 +131,7 @@ export default function HomePage() {
               Back
             </ButtonLink>
           </div>
-          <div className='mt-4'>
-            {data ? (
-              data.map((tweet: any) => (
-                <Tweet
-                  key={tweet.id}
-                  id={tweet.id}
-                  className='mt-4 rounded-md border border-gray-300 p-4'
-                />
-              ))
-            ) : (
-              <p>Loading...</p>
-            )}
-          </div>
+          <div className='mt-4'>{data ? data : <p>Loading...</p>}</div>
         </div>
       </Layout>
     );
