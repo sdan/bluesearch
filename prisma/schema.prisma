@@ -76,6 +76,7 @@ model TimelineTweets {
 model LikedTweets {
   id        String   @id @default(cuid())
   author    String
+  username String
   text      String
   likes     Int      @default(0)
   retweets  Int      @default(0)

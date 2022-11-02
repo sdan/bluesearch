@@ -37,6 +37,11 @@ export default function Header() {
                     Top liked quote tweets
                   </a>
                 </Link>
+                <Link href='/quote_tweets'>
+                  <a className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'>
+                    Most engaged with users
+                  </a>
+                </Link>
                 <button
                   onClick={() => signOut()}
                   className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'

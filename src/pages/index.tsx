@@ -79,6 +79,14 @@ export default function HomePage() {
                 Top Liked Quote Tweets
               </ButtonLink>
             </div>
+            <div className='mt-3 sm:mt-0 sm:ml-3'>
+              <ButtonLink
+                href='/engaged'
+                className='flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-8 py-3 text-base font-medium text-white hover:bg-blue-700 md:py-4 md:px-10 md:text-lg'
+              >
+                Most engaged with users
+              </ButtonLink>
+            </div>
           </div>
         </div>
       </Layout>

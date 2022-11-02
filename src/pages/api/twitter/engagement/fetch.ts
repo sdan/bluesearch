@@ -11,12 +11,15 @@ export default async function handle(
   console.log('in api liked fetch');
   console.log('req.body', req.body);
   const { accessToken, twtrId } = req.body;
-
+  let bearerToken;
   try {
-    if (!accessToken && !twtrId) {
-      throw new Error('No access token or twitter id');
+    bearerToken = process.env.TWITTER_BEARER_TOKEN;
+    if (!bearerToken && !twtrId) {
+      throw new Error('No bearer token or twitter id');
     }
-    const tClient = new Client(accessToken);
+    console.log('bearerToken', bearerToken);
+
+    const tClient = new Client(bearerToken!);
 
     console.log('api route twitter', accessToken);
 
@@ -34,28 +37,45 @@ export default async function handle(
 export async function StoreLikedTweets(
   pc: PrismaClient,
   tweetData: Tweet,
+  username: string,
   providerAccountId: any
 ) {
   console.log('tweets in storetweets');
-  const twt = await pc.tweet.create({
+
+  const twt = await pc.account.update({
+    where: {
+      providerAccountId: providerAccountId,
+    },
     data: {
-      id: tweetData.id,
-      author: tweetData.author_id!,
-      text: tweetData.text,
-      likes: tweetData.public_metrics?.like_count,
-      retweets: tweetData.public_metrics?.retweet_count,
-      entities: tweetData.entities,
-      createdAt: tweetData.created_at!,
-      user: {},
-      userLikes: {
-        connect: {
-          providerAccountId,
+      LikedTweets: {
+        connectOrCreate: {
+          where: {
+            id: tweetData.id,
+          },
+          create: {
+            id: tweetData.id,
+            username: username,
+            author: tweetData.author_id!,
+            text: tweetData.text,
+            likes: tweetData.public_metrics?.like_count,
+            retweets: tweetData.public_metrics?.retweet_count,
+            entities: tweetData.entities,
+            createdAt: tweetData.created_at!,
+          },
         },
       },
     },
   });
-  console.log('liked tweet inserted', twt.id);
+
+  console.log('liked tweet inserted', tweetData.id);
   return twt;
+}
+
+export async function UserIdToUsername(twtrId: string) {
+  const bearerToken = process.env.TWITTER_BEARER_TOKEN;
+  const tClient = new Client(bearerToken!);
+  const user = await tClient.users.findUserById(twtrId);
+  return user.data?.username;
 }
 
 // Fetches all likes from a specific user from Twitter API
@@ -67,15 +87,24 @@ export async function FetchLikes(tClient: Client, twtrId: string) {
   // Fetch all likes from Twitter API
   const likes = tClient.tweets.usersIdLikedTweets(twtrId, {
     max_results: 100,
+    'tweet.fields': [
+      'author_id',
+      'geo',
+      'public_metrics',
+      'created_at',
+      'entities',
+    ],
   });
   console.log('likes', likes);
 
   // Store all likes in database
   for await (const page of likes) {
     for (const tweet of page.data ?? []) {
+      console.log('page user ', page.includes?.users);
       console.log('liked tweet: ', tweet);
+      const username = (await UserIdToUsername(tweet.author_id!)) || '';
 
-      await StoreLikedTweets(prisma, tweet, twtrId);
+      await StoreLikedTweets(prisma, tweet, username, twtrId);
     }
     numTweets += page.data?.length ?? 0;
   }

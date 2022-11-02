@@ -43,16 +43,17 @@ export default function HomePage() {
     // console.log('access token fetcher', session?.accessToken, session?.twtrId);
     // console.log('arg.accessToken', arg.accessToken);
     // console.log('arg.twtrId', arg.twtrId);
+    console.log('FETCHLIKE args', args);
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('FT args', args);
-      console.log('url', args.url);
+      console.log('LT args', session?.accessToken);
+      console.log('LT twtrid', session?.twtrId);
     }
-    return fetch(args.url, {
+    return fetch(args[0], {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        accessToken: args.args.accessToken,
-        twtrId: args.args.twtrId,
+        accessToken: args[1]?.accessToken,
+        twtrId: args[1]?.twtrId,
       }),
     }).then((res) => res.json());
   }
@@ -91,16 +92,28 @@ export default function HomePage() {
     accessToken: session?.accessToken,
     twtrId: session?.twtrId,
   };
-  const { data: fetchedTweets, error: fetchedTweetError } = useSWR(
-    { url: '/api/twitter/engagement/fetch', args: fetchTweetArgs },
+  // const { data: fetchedTweets, error: fetchedTweetError } = useSWR(
+  //   { url: '/api/twitter/engagement/fetch', args: fetchTweetArgs },
+  //   fetchLikes
+  // );
+
+  const {
+    data: fetchedTweets,
+    trigger,
+    isMutating,
+    error: fetchedTweetError,
+  } = useSWRMutation(
+    ['/api/twitter/engagement/fetch', fetchTweetArgs],
     fetchLikes
   );
-  // if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-  console.log('fetchedTweet Error', fetchedTweetError);
-  console.log('fetchedTweets', fetchedTweets);
-  // }
 
+  if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+    console.log('fetchedTweet Error', fetchedTweetError);
+    console.log('fetchedTweets', fetchedTweets);
+  }
+  console.log('tweet data', data);
   // Design the Top Liked Tweets page with the tweets from the database with a similar style to the rest of the site. Make sure to include a loading state and error state. You can use the `useSWR` hook to fetch the data from the database.
+  // Iterate through data object or display loading state
   if (!session) {
     return (
       <Layout>
@@ -123,15 +136,28 @@ export default function HomePage() {
           <p className='mt-4 text-xl text-gray-500'>
             Here are the people you frequently engage with on Twitter
           </p>
-          <div className='mt-4'>
-            <ButtonLink
-              href='/'
-              className='block rounded-md bg-blue-500 px-4 py-2 text-center text-white hover:bg-blue-600'
+          <div className='flex flex-col items-center justify-center py-2'>
+            <button
+              className='rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700'
+              onClick={() => trigger(fetchTweetArgs)}
             >
-              Back
-            </ButtonLink>
+              Fetch likes
+            </button>
+            {isMutating && <p>Fetching users...</p>}
           </div>
-          <div className='mt-4'>{data ? data : <p>Loading...</p>}</div>
+
+          {data &&
+            Object.entries(data).map(([key, value]) => {
+              return (
+                <div key={key}>
+                  <h2>
+                    {key}: {data[key]}
+                  </h2>
+
+                  <hr />
+                </div>
+              );
+            })}
         </div>
       </Layout>
     );
