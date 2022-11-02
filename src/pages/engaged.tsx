@@ -151,7 +151,7 @@ export default function HomePage() {
               return (
                 <div key={key}>
                   <h2>
-                    {key}: {data[key]}
+                    <a href={`https://twitter.com/${key}`}>@{key}</a>: {value}
                   </h2>
 
                   <hr />
