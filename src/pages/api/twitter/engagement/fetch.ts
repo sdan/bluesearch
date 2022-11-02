@@ -11,15 +11,10 @@ export default async function handle(
   console.log('in api liked fetch');
   console.log('req.body', req.body);
   const { accessToken, twtrId } = req.body;
-  let bearerToken;
   try {
-    bearerToken = process.env.TWITTER_BEARER_TOKEN;
-    if (!bearerToken && !twtrId) {
-      throw new Error('No bearer token or twitter id');
-    }
-    console.log('bearerToken', bearerToken);
+    console.log('accessToken', accessToken);
 
-    const tClient = new Client(bearerToken!);
+    const tClient = new Client(accessToken!);
 
     console.log('api route twitter', accessToken);
 
@@ -71,9 +66,7 @@ export async function StoreLikedTweets(
   return twt;
 }
 
-export async function UserIdToUsername(twtrId: string) {
-  const bearerToken = process.env.TWITTER_BEARER_TOKEN;
-  const tClient = new Client(bearerToken!);
+export async function UserIdToUsername(tClient: Client, twtrId: string) {
   const user = await tClient.users.findUserById(twtrId);
   return user.data?.username;
 }
@@ -102,7 +95,8 @@ export async function FetchLikes(tClient: Client, twtrId: string) {
     for (const tweet of page.data ?? []) {
       console.log('page user ', page.includes?.users);
       console.log('liked tweet: ', tweet);
-      const username = (await UserIdToUsername(tweet.author_id!)) || '';
+      const username =
+        (await UserIdToUsername(tClient, tweet.author_id!)) || '';
 
       await StoreLikedTweets(prisma, tweet, username, twtrId);
     }

@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { components } from 'twitter-api-sdk/dist/types';
-import { UserIdToUsername } from './fetch';
 type Tweet = components['schemas']['Tweet'];
 const prisma = new PrismaClient();
 

@@ -1,5 +1,5 @@
 import NextAuth from 'next-auth';
-import TwitterProvider from 'next-auth/providers/twitter';
+import TwitterProvider from '../../../lib/twitter';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
 import { Client } from 'twitter-api-sdk';
