@@ -57,7 +57,7 @@ export async function EngagementStats(tweelist: any) {
   // Make object of users and number of tweets liked from them
   const userEngagement: any = {};
   for (let i = 0; i < tweetlist.length; i++) {
-    const username = (await UserIdToUsername(tweetlist[i].author)) || '';
+    const username = tweetlist[i].username;
     if (userEngagement[username]) {
       userEngagement[username] += 1;
     } else {
