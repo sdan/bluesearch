@@ -139,8 +139,9 @@ export default function HomePage() {
         <div className='flex min-h-screen flex-col items-center justify-center py-2'>
           <p className='text-4xl font-bold'>Top Liked Tweets</p>
           <p className='mt-4 text-xl text-gray-500'>
-            Here are your top liked tweets. Give it a second, it might take a
-            while to load if you&apos;re a new user.
+            Here is your timeline from the past 24 hours sorted by likes. Give
+            it a second, it might take a while to load if you&apos;re a new
+            user.
           </p>
           <div className='mt-4'>
             <ButtonLink
