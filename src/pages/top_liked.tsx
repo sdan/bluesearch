@@ -132,7 +132,6 @@ export default function HomePage() {
       </Layout>
     );
   } else {
-    console.log('dataWHAT', data);
     return (
       <Layout>
         <Seo templateTitle='Home' />
@@ -140,7 +139,8 @@ export default function HomePage() {
         <div className='flex min-h-screen flex-col items-center justify-center py-2'>
           <p className='text-4xl font-bold'>Top Liked Tweets</p>
           <p className='mt-4 text-xl text-gray-500'>
-            Here are your top liked tweets.
+            Here are your top liked tweets. Give it a second, it might take a
+            while to load if you&apos;re a new user.
           </p>
           <div className='mt-4'>
             <ButtonLink
