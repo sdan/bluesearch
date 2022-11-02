@@ -10,14 +10,15 @@ export default async function handle(req: any, res: any) {
   const waitData = (await PullTweets(twtrId)).tweetlist;
   console.log('waitData data', waitData['TimelineTweets']);
   // return data
+  const returnTweets: any = {};
   for (let i = 0; i < waitData['TimelineTweets'].length; i++) {
-    console.log(
-      waitData['TimelineTweets'][i]['id'] +
-        ': ' +
-        waitData['TimelineTweets'][i]['text']
-    );
+    const key = waitData['TimelineTweets'][i]['id'];
+    const value = waitData['TimelineTweets'][i]['text'];
+    console.log('key', key);
+    console.log('value', value);
+    returnTweets[key] = value;
   }
-  res.status(200).json();
+  res.status(200).json(returnTweets);
 }
 
 export async function PullTweets(twtrId: any) {
@@ -26,7 +27,7 @@ export async function PullTweets(twtrId: any) {
   console.log("session exists and user's twitter id exists");
   const prisma = new PrismaClient();
 
-  //find tweets by user id and sort by likes in descending order (most likes first) for the past 24 hours
+  //find tweets by user id and sort by time for the past 24 hours
   tweetlist = await prisma.account.findFirst({
     where: {
       providerAccountId: twtrId,
@@ -34,7 +35,7 @@ export async function PullTweets(twtrId: any) {
     select: {
       TimelineTweets: {
         orderBy: {
-          likes: 'desc',
+          createdAt: 'desc',
         },
         where: {
           createdAt: {
