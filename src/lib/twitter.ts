@@ -1,5 +1,3 @@
-import type { OAuthConfig, OAuthUserConfig } from '.';
-
 export interface TwitterLegacyProfile {
   id: number;
   id_str: string;
