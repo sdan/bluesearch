@@ -42,6 +42,11 @@ export default function Header() {
                     Most engaged with users
                   </a>
                 </Link>
+                <Link href='/summary'>
+                  <a className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'>
+                    Summary of your TL
+                  </a>
+                </Link>
                 <button
                   onClick={() => signOut()}
                   className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'
