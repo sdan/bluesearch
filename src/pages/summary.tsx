@@ -34,24 +34,48 @@ export default function HomePage() {
     return summaryData;
   }
 
-  const { data, trigger, isMutating, error } = useSWRMutation(
+  function fetchTimeline(args: any) {
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('FT args', args);
+    }
+    return fetch(args[0], {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accessToken: args[1].accessToken,
+        twtrId: args[1].twtrId,
+      }),
+    }).then((res) => res.json());
+  }
+
+  const {
+    data: pullSummary,
+    trigger: triggerSummary,
+    isMutating: mutatingSummary,
+    error: errorSummary,
+  } = useSWRMutation(
     ['/api/twitter/summary/pull', session?.twtrId],
     sendRequest
   );
-  console.log('isMutating', isMutating);
-  console.log('error', error);
 
-  if (error) {
-    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('useSwr error', error);
-    }
-  }
+  const timelineArgs: ApiRequest = {
+    accessToken: session?.accessToken,
+    twtrId: session?.twtrId,
+  };
 
-  console.log('summary swr data', data);
+  const {
+    data: timelineData,
+    trigger: timlineTrigger,
+    isMutating: timelineMutating,
+    error: timelineError,
+  } = useSWRMutation(
+    ['/api/internal/top_liked/fetch', timelineArgs],
+    fetchTimeline
+  );
 
   // Style page with Tailwind CSS that follows the same design as the rest of the site
-  // Include a input field for the user to enter a tweet id
-  // Show the quote tweet if the user has entered a tweet id and the quote tweet is found and a loading indicator if the quote tweet is being fetched and an error message if the quote tweet is not found
+  // Include a button to "Pull latest timeline" and a button to "Summarize" the timeline
+  // Show the summary if it exists and is not empty otherwise show a loading indicator or message that the summary is being generated and an error message if the summary is not found or is empty (i.e. no tweets in the timeline) or if the user is not signed in
   if (session) {
     return (
       <Layout>
@@ -67,29 +91,47 @@ export default function HomePage() {
               <p className='mt-4 md:text-lg'>
                 This page shows a summary of your timeline
               </p>
-            </div>
-            <div>
-              <p className='mt-2 text-sm text-gray-700'>
-                <>
-                  <button
-                    className='mt-2 rounded-md border border-gray-300 p-2'
-                    onClick={() => {
-                      trigger();
-                    }}
-                  >
-                    Refresh timeline
-                  </button>
-                </>
-              </p>
-              <p className='mt-2 text-sm text-gray-700'>
-                {isMutating ? 'Loading...' : ''}
-              </p>
-              <p className='mt-2 text-sm text-gray-700'>
-                {userError ? userError : ''}
-              </p>
-              <span className='mt-2 text-sm text-gray-700'>
-                {data ? <p>{data.summary}</p> : <p>no data</p>}
-              </span>
+              <div className='mt-8'>
+                <button
+                  className='rounded bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-700'
+                  onClick={() => timlineTrigger()}
+                >
+                  Pull latest timeline
+                </button>
+              </div>
+              <div className='mt-8'>
+                <button
+                  className='rounded bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-700'
+                  onClick={() => triggerSummary()}
+                >
+                  Summarize
+                </button>
+              </div>
+              <div className='mt-8'>
+                <h2 className='mt-8 text-4xl md:text-6xl'>
+                  {pullSummary?.summary}
+                </h2>
+                <p className='mt-4 md:text-lg'>
+                  {pullSummary?.summary == '' ? 'No summary yet' : ''}
+                </p>
+              </div>
+              <div className='mt-8'>
+                <h2 className='mt-8 text-4xl md:text-6xl'>
+                  {mutatingSummary ? 'Loading...' : ''}
+                </h2>
+              </div>
+
+              <div className='mt-8'>
+                <h2 className='mt-8 text-4xl md:text-6xl'>
+                  {errorSummary ? 'Error' : ''}
+                </h2>
+              </div>
+
+              <div className='mt-8'>
+                <h2 className='mt-8 text-4xl md:text-6xl'>
+                  {timelineError ? 'Error' : ''}
+                </h2>
+              </div>
             </div>
           </section>
         </main>
