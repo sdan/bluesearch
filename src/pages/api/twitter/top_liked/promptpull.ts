@@ -7,21 +7,11 @@ export default async function handle(req: any, res: any) {
   console.log('in api pull');
   console.log('req.body', req.body);
   const { accessToken, twtrId } = req.body;
-  const waitData = (await PullTweets(twtrId)).tweetlist;
-  console.log('waitData data', waitData['TimelineTweets']);
-  // return data
-  const returnTweets: any = {};
-  for (let i = 0; i < waitData['TimelineTweets'].length; i++) {
-    const key = waitData['TimelineTweets'][i]['id'];
-    const value = waitData['TimelineTweets'][i]['text'];
-    console.log('key', key);
-    console.log('value', value);
-    returnTweets[key] = value;
-  }
+  const returnTweets = await PullPromptTweets(twtrId);
   res.status(200).json(returnTweets);
 }
 
-export async function PullTweets(twtrId: any) {
+export async function PullPromptTweets(twtrId: any) {
   let tweetlist: any = [];
 
   console.log("session exists and user's twitter id exists");
@@ -45,18 +35,28 @@ export async function PullTweets(twtrId: any) {
         },
         select: {
           text: true,
-          id: true,
+          author: true,
         },
       },
     },
   });
   console.log('twtrId in API', twtrId);
   console.log('twts', tweetlist[0]);
+  console.log('tweetlist data', tweetlist['TimelineTweets']);
+  // return data
+  const returnTweets = [];
+  // Make array of tweets
 
-  //   return {
-  //     tweetlist: JSON.parse(JSON.stringify(tweetlist)),
-  //   };
-  return {
-    tweetlist,
-  };
+  for (let i = 0; i < tweetlist['TimelineTweets'].length; i++) {
+    returnTweets[i] = tweetlist['TimelineTweets'][i]['text'];
+  }
+
+  // for (let i = 0; i < tweetlist['TimelineTweets'].length; i++) {
+  //   const key = tweetlist['TimelineTweets'][i]['author'];
+  //   const value = tweetlist['TimelineTweets'][i]['text'];
+  //   console.log('key', key);
+  //   console.log('value', value);
+  //   returnTweets[key] = value;
+  // }
+  return returnTweets;
 }

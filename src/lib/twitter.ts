@@ -1,3 +1,5 @@
+import { OAuthConfig, OAuthUserConfig } from 'next-auth/providers/oauth';
+
 export interface TwitterLegacyProfile {
   id: number;
   id_str: string;

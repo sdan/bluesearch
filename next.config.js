@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/twitter/top_liked/fetch',
+        destination: 'https://api.tanager.app/api/twitter/top_liked/fetch',
+      },
+    ];
+  },
   eslint: {
     dirs: ['src'],
   },
@@ -7,11 +15,9 @@ module.exports = {
   reactStrictMode: true,
 
   // Uncoment to add domain whitelist
-   images: {
-     domains: [
-       'res.cloudinary.com', 'pbs.twimg.com', 'abs.twimg.com'
-     ],
-   },
+  images: {
+    domains: ['res.cloudinary.com', 'pbs.twimg.com', 'abs.twimg.com'],
+  },
 
   // SVGR
   webpack(config) {

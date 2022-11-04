@@ -103,7 +103,7 @@ export default function HomePage() {
     isMutating,
     error: fetchedTweetError,
   } = useSWRMutation(
-    ['/api/twitter/engagement/fetch', fetchTweetArgs],
+    ['/api/internal/engagement/fetch', fetchTweetArgs],
     fetchLikes
   );
 

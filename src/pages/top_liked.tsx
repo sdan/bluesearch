@@ -45,14 +45,13 @@ export default function HomePage() {
     // console.log('arg.twtrId', arg.twtrId);
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
       console.log('FT args', args);
-      console.log('url', args.url);
     }
-    return fetch(args.url, {
+    return fetch(args[0], {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        accessToken: args.args.accessToken,
-        twtrId: args.args.twtrId,
+        accessToken: args[1].accessToken,
+        twtrId: args[1].twtrId,
       }),
     }).then((res) => res.json());
   }
@@ -92,10 +91,17 @@ export default function HomePage() {
     accessToken: session?.accessToken,
     twtrId: session?.twtrId,
   };
-  const { data: fetchedTweets, error: fetchedTweetError } = useSWR(
-    { url: '/api/twitter/top_liked/fetch', args: fetchTweetArgs },
+
+  const {
+    data: fetchedTweets,
+    trigger,
+    isMutating,
+    error: fetchedTweetError,
+  } = useSWRMutation(
+    ['/api/internal/top_liked/fetch', fetchTweetArgs],
     fetchTweets
   );
+
   if (fetchedTweetError) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
       console.log('fetchedTweetError', fetchedTweetError);
@@ -152,12 +158,26 @@ export default function HomePage() {
             </ButtonLink>
           </div>
           <div className='mt-4'>
-            <ButtonLink
-              href='/top_liked'
+            <button
               className='block rounded-md bg-blue-500 px-4 py-2 text-center text-white hover:bg-blue-600'
+              onClick={() => {
+                trigger();
+              }}
             >
               Refresh
-            </ButtonLink>
+            </button>
+
+            {isMutating && (
+              <p className='mt-4 text-xl text-gray-500'>
+                Refreshing your tweets...
+              </p>
+            )}
+
+            {fetchedTweetError && (
+              <p className='mt-4 text-xl text-gray-500'>
+                There was an error refreshing your tweets. Please try again.
+              </p>
+            )}
           </div>
           <div className='mt-4'>
             {data ? (
