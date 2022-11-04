@@ -8,6 +8,7 @@ import useSWRMutation from 'swr/mutation';
 import useSWRImmutable from 'swr/immutable';
 import { PrismaClient } from '@prisma/client';
 import { Tweet } from 'react-static-tweets';
+import Parser from 'html-react-parser';
 
 type Props = {
   tweetlist: any[];
@@ -108,16 +109,21 @@ export default function HomePage() {
                 </button>
               </div>
               <div className='mt-8'>
-                <h2 className='mt-8 text-4xl md:text-6xl'>
-                  {pullSummary?.summary}
-                </h2>
+                <h4 className='text-1xl mt-8 md:text-2xl'>
+                  {Parser(pullSummary?.summary || '')}
+                </h4>
                 <p className='mt-4 md:text-lg'>
                   {pullSummary?.summary == '' ? 'No summary yet' : ''}
                 </p>
               </div>
               <div className='mt-8'>
                 <h2 className='mt-8 text-4xl md:text-6xl'>
-                  {mutatingSummary ? 'Loading...' : ''}
+                  {mutatingSummary ? 'Summarizing...' : ''}
+                </h2>
+              </div>
+              <div className='mt-8'>
+                <h2 className='mt-8 text-4xl md:text-6xl'>
+                  {timelineMutating ? 'Fetching timeline...' : ''}
                 </h2>
               </div>
 

@@ -47,7 +47,7 @@ async function GenerateSummary(tweets: any) {
   // Add text to prompt
   const promptText =
     prompt +
-    '###\n\nHere is a feed of tweets. It is formatted with a list of tweets. Give me a detailed summary brief of the news of the day. Are there any interesting tweets in particular? Be specifc.\n\n';
+    '###\n\nHere is a feed of tweets. Give me a detailed breif of good tweets. Be specifc and highlight good tweets.\n\n';
 
   console.log('here is prompt', promptText);
   const response = await gpt3.createCompletion({
