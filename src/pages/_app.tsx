@@ -1,5 +1,6 @@
 import { AppProps } from 'next/app';
 import { SessionProvider } from 'next-auth/react';
+import { Session } from 'next-auth';
 
 import '@/styles/globals.css';
 // !STARTERCONF This is for demo purposes, remove @/styles/colors.css import immediately
@@ -12,10 +13,15 @@ import 'react-static-tweets/styles.css';
  * ? `Layout` component is called in every page using `np` snippets. If you have consistent layout across all page, you can add it here too
  */
 
-function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+function MyApp({
+  Component,
+  pageProps,
+}: AppProps<{
+  session: Session;
+}>) {
   return (
-    <SessionProvider session={session}>
-      <Component {...pageProps} />;
+    <SessionProvider session={pageProps.session}>
+      <Component {...pageProps} />
     </SessionProvider>
   );
 }

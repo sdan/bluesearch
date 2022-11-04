@@ -1,13 +1,5 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
-  async rewrites() {
-    return [
-      {
-        source: '/api/twitter/top_liked/fetch',
-        destination: 'https://api.tanager.app/api/twitter/top_liked/fetch',
-      },
-    ];
-  },
   eslint: {
     dirs: ['src'],
   },
