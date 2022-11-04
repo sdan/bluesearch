@@ -1,3 +1,4 @@
+// @ts-ignore
 import NextAuth from 'next-auth';
 import TwitterProvider from '../../../lib/twitter';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
