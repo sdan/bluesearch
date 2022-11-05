@@ -141,7 +141,10 @@ export default function HomePage() {
               <div className='mt-8'>
                 <h2 className='mt-4 text-red-500 md:text-lg'>
                   {errorSummary
-                    ? 'Error\n' + errorSummary.status + '\n' + errorSummary.info
+                    ? 'Summary error \n' +
+                      errorSummary.status +
+                      '\n' +
+                      errorSummary.info
                     : ''}
                 </h2>
               </div>
@@ -149,7 +152,7 @@ export default function HomePage() {
               <div className='mt-8'>
                 <h2 className='mt-4 text-red-500 md:text-lg'>
                   {timelineError
-                    ? 'Error\n' +
+                    ? 'Timeline error\n' +
                       timelineError.status +
                       '\n' +
                       timelineError.info
