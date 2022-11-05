@@ -22,17 +22,21 @@ export default function HomePage() {
   async function sendRequest(args: any) {
     console.log('sendRequest args', args);
 
-    const fetchSummary = await fetch(args[0], {
+    return fetch(args[0], {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         twtrId: args[1],
       }),
+    }).then((res) => {
+      if (!res.ok) {
+        const err = new Error('Summary response was not ok');
+        err.info = res.json();
+        err.status = res.status;
+        throw err;
+      }
+      return res.json();
     });
-
-    const summaryData = await fetchSummary.json();
-    console.log('summaryData fetch data', summaryData);
-    return summaryData;
   }
 
   function fetchTimeline(args: any) {
@@ -46,7 +50,15 @@ export default function HomePage() {
         accessToken: args[1].accessToken,
         twtrId: args[1].twtrId,
       }),
-    }).then((res) => res.json());
+    }).then((res) => {
+      if (!res.ok) {
+        const err = new Error('Timeline response was not ok');
+        err.info = res.json();
+        err.status = res.status;
+        throw err;
+      }
+      return res.json();
+    });
   }
 
   const {
@@ -126,16 +138,22 @@ export default function HomePage() {
                   {timelineMutating ? 'Fetching timeline...' : ''}
                 </h2>
               </div>
-
               <div className='mt-8'>
-                <h2 className='mt-8 text-4xl md:text-6xl'>
-                  {errorSummary ? 'Error' : ''}
+                <h2 className='mt-4 text-red-500 md:text-lg'>
+                  {errorSummary
+                    ? 'Error\n' + errorSummary.status + '\n' + errorSummary.info
+                    : ''}
                 </h2>
               </div>
 
               <div className='mt-8'>
-                <h2 className='mt-8 text-4xl md:text-6xl'>
-                  {timelineError ? 'Error' : ''}
+                <h2 className='mt-4 text-red-500 md:text-lg'>
+                  {timelineError
+                    ? 'Error\n' +
+                      timelineError.status +
+                      '\n' +
+                      timelineError.info
+                    : ''}
                 </h2>
               </div>
             </div>
