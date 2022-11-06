@@ -5,7 +5,7 @@ import { Client } from 'twitter-api-client';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { components } from 'twitter-api-sdk/dist/types';
 import { Configuration, OpenAIApi } from 'openai';
-import { PullPromptTweets } from '../top_liked/promptpull.ts';
+import { PullPromptTweets } from './promptpull.ts';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,

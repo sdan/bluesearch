@@ -177,7 +177,9 @@ export default function Twitter<
       type: 'oauth',
       authorization: {
         url: 'https://twitter.com/i/oauth2/authorize',
-        params: { scope: 'users.read tweet.read like.read offline.access' },
+        params: {
+          scope: 'users.read tweet.read like.read list.read offline.access',
+        },
       },
       token: {
         url: 'https://api.twitter.com/2/oauth2/token',

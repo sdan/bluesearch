@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,23 +8,20 @@ datasource db {
 }
 
 model Account {
-  providerAccountId String  @id
+  providerAccountId String           @id
   userId            String
   type              String?
   provider          String?
-
-  refresh_token String? @db.Text
-  access_token  String? @db.Text
-  expires_at    Int?
-  token_type    String?
-  scope         String?
-  id_token      String? @db.Text
-  session_state String?
-
-  user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  TimelineTweets TimelineTweets[]
-  LikedTweets LikedTweets[] 
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  LikedTweets       LikedTweets[]
+  TimelineTweets    TimelineTweets[]
 
   @@unique([provider, providerAccountId])
 }
@@ -59,7 +53,7 @@ model VerificationToken {
 }
 
 model TimelineTweets {
-  id        String   @id @default(cuid())
+  id        String   @id @unique @default(cuid())
   author    String
   text      String
   likes     Int      @default(0)
@@ -67,23 +61,18 @@ model TimelineTweets {
   entities  Json?
   createdAt DateTime
   userId    String
-
-  user Account @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
-  // Use Tweet model to store list of the users liked tweets
-  @@unique([id])
+  user      Account  @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
 }
 
 model LikedTweets {
-  id        String   @id @default(cuid())
+  id        String   @id @unique @default(cuid())
   author    String
-  username String
+  username  String
   text      String
   likes     Int      @default(0)
   retweets  Int      @default(0)
   entities  Json?
   createdAt DateTime
   userId    String
-  // Use Tweet model to store list of the users liked tweets
-  user Account @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
-  @@unique([id])
+  user      Account  @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
 }
