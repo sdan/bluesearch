@@ -22,39 +22,42 @@ export default function HomePage() {
   async function sendRequest(args: any) {
     console.log('sendRequest args', args);
 
-    return fetch(args[0], {
+    const res = await fetch(args[0], {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         twtrId: args[1],
       }),
-    }).then((res) => {
-      if (!res.ok) {
-        const err = new Error('Summary response was not ok');
-        err.info = res.json();
-        err.status = res.status;
-        throw err;
-      }
-      return res.json();
     });
+
+    if (!res.ok) {
+      const err = new Error('Summary response was not ok');
+      err.info = await res.json();
+      console.log('erro info', err.info);
+      err.status = res.status;
+      console.log('SUMMARY ERROR', err);
+      throw err;
+    }
+    return res.json();
   }
 
-  function fetchTimeline(args: any) {
+  async function fetchTimeline(args: any) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
       console.log('FT args', args);
     }
-    return fetch(args[0], {
+    return await fetch(args[0], {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         accessToken: args[1].accessToken,
         twtrId: args[1].twtrId,
       }),
-    }).then((res) => {
+    }).then(async (res) => {
       if (!res.ok) {
         const err = new Error('Timeline response was not ok');
-        err.info = res.json();
+        err.info = await res.json();
         err.status = res.status;
+        console.log('SUMMARY ERROR', err);
         throw err;
       }
       return res.json();
@@ -122,7 +125,10 @@ export default function HomePage() {
               </div>
               <div className='mt-8'>
                 <h4 className='text-1xl mt-8 md:text-2xl'>
-                  {Parser(pullSummary?.summary || '')}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: pullSummary?.summary }}
+                    style={{ whiteSpace: 'pre-line' }}
+                  />
                 </h4>
                 <p className='mt-4 md:text-lg'>
                   {pullSummary?.summary == '' ? 'No summary yet' : ''}
@@ -152,7 +158,7 @@ export default function HomePage() {
               <div className='mt-8'>
                 <h2 className='mt-4 text-red-500 md:text-lg'>
                   {timelineError
-                    ? 'Timeline error\n' +
+                    ? 'Timeline error \n' +
                       timelineError.status +
                       '\n' +
                       timelineError.info

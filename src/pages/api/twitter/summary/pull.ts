@@ -23,6 +23,7 @@ export default async function handle(
 
     // Pulls timeline
     const timelineTweets = await PullPromptTweets(twtrId);
+    console.log('timelineTweets', timelineTweets);
 
     // Select random group of 75 tweets from timelineTweets array
     const randomTweets = timelineTweets.sort(() => 0.5 - Math.random());
@@ -47,7 +48,7 @@ async function GenerateSummary(tweets: any) {
   // Add text to prompt
   const promptText =
     prompt +
-    '###\n\nHere is a feed of tweets. Give me a detailed breif of good tweets. Be specifc and highlight good tweets.\n\n';
+    '\n\n ### \nHere is a feed of tweets. Give me a summary of the 5 most insightful or eventful tweets in the feed. Be specific and reference direct people.';
 
   console.log('here is prompt', promptText);
   const response = await gpt3.createCompletion({
