@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { components } from 'twitter-api-sdk/dist/types';
 import { Configuration, OpenAIApi } from 'openai';
-import { PullPromptTweets } from './promptpull';
+import { PullPromptListTweets } from '../promptpull';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -14,14 +14,14 @@ export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log('in api summary pull');
+  console.log('in api summary LIST pull');
   console.log('req.body', req.body);
-  const { twtrId } = req.body;
+  const { listId } = req.body;
   try {
-    console.log('twtr ID', twtrId);
+    console.log('listId ID', listId);
 
     // Pulls timeline
-    const timelineTweets = await PullPromptTweets(twtrId);
+    const timelineTweets = await PullPromptListTweets(listId);
     console.log('timelineTweets', timelineTweets);
 
     // Select random group of 75 tweets from timelineTweets array

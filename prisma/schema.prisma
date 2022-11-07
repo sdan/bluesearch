@@ -64,6 +64,17 @@ model TimelineTweets {
   user      Account  @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
 }
 
+model ListTweets {
+  listId    String
+  id        String   @id @unique @default(cuid())
+  author    String
+  text      String
+  likes     Int      @default(0)
+  retweets  Int      @default(0)
+  entities  Json?
+  createdAt DateTime
+}
+
 model LikedTweets {
   id        String   @id @unique @default(cuid())
   author    String

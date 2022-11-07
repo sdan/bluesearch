@@ -1,18 +1,12 @@
+// @ts-nocheck
+import { useSession } from 'next-auth/react';
 import * as React from 'react';
-import Layout from '@/components/layout/Layout';
-import ButtonLink from '@/components/links/ButtonLink';
-import Seo from '@/components/Seo';
-import { signIn, signOut, useSession, getSession } from 'next-auth/react';
-
-import useSWRMutation from 'swr/mutation';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
-import { PrismaClient } from '@prisma/client';
-import { Tweet } from 'react-static-tweets';
-
-type Props = {
-  tweetlist: any[];
-};
+import Layout from '@/components/layout/Layout';
+import Seo from '@/components/Seo';
+import { Session } from 'next-auth';
 
 export default function HomePage() {
   const { data: session } = useSession();

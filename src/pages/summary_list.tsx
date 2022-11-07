@@ -8,6 +8,7 @@ import useSWRMutation from 'swr/mutation';
 import useSWRImmutable from 'swr/immutable';
 import { PrismaClient } from '@prisma/client';
 import { Tweet } from 'react-static-tweets';
+import Parser from 'html-react-parser';
 
 type Props = {
   tweetlist: any[];
@@ -15,114 +16,191 @@ type Props = {
 
 export default function HomePage() {
   const { data: session } = useSession();
+  const [inputListId, setInputListId] = React.useState('');
 
   const [userError, setUserError] = React.useState('');
-  const [inputTweetId, setInputTweetId] = React.useState('');
 
-  //inputtweetid react state of type Input
-  //   const [inputTweetId, setInputTweetId] = React.useState('');
-
-  async function sendRequest(url: any, args: any) {
-    console.log('sendRequest url', url);
+  async function sendRequest(args: any) {
     console.log('sendRequest args', args);
-    // refreshSession();
+    console.log('fetching list timeline');
 
-    console.log('sendRequest session', session?.accessToken);
-    console.log('sendRequest session', session);
+    timlineTrigger();
 
-    if (args.arg && session && session.accessToken) {
-      const fetchQuote = await fetch('/api/twitter/quote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          accessToken: session.accessToken,
-          tweetId: args.arg,
-        }),
-      });
-      const quoteData = await fetchQuote.json();
-      console.log('quote fetch data', quoteData);
-      return quoteData;
-    } else {
-      console.log('no args');
-      setUserError('try signing again');
+    const listLink = args[1];
+    // get the last element of url without the query string
+    const lastItem = listLink.substring(listLink.lastIndexOf('/') + 1);
+    const cleanId = lastItem.split('?')[0];
+    console.log('cleanId summary pull', cleanId);
+
+    args[1] = cleanId;
+
+    console.log('PT args clean', args);
+
+    const res = await fetch(args[0], {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        listId: args[1],
+      }),
+    });
+
+    if (!res.ok) {
+      const err = new Error('Summary response was not ok');
+      err.info = await res.json();
+      console.log('erro info', err.info);
+      err.status = res.status;
+      console.log('SUMMARY ERROR', err);
+      throw err;
     }
+    return res.json();
   }
 
-  const { data, trigger, isMutating, error } = useSWRMutation(
-    ['/api/twitter/quote', inputTweetId],
+  async function fetchTimeline(args: any) {
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('FT args 2', args);
+    }
+
+    const listLink = args[1].listId;
+    // get the last element of url without the query string
+    const lastItem = listLink.substring(listLink.lastIndexOf('/') + 1);
+    const cleanId = lastItem.split('?')[0];
+    console.log('cleanId', cleanId);
+
+    args[1].listId = cleanId;
+
+    console.log('FT args clean', args);
+
+    return await fetch(args[0], {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accessToken: args[1].accessToken,
+        listId: args[1].listId,
+      }),
+    }).then(async (res) => {
+      if (!res.ok) {
+        const err = new Error('Timeline response was not ok');
+        err.info = await res.json();
+        err.status = res.status;
+        console.log('SUMMARY ERROR', err);
+        throw err;
+      }
+      return res.json();
+    });
+  }
+
+  const {
+    data: pullSummary,
+    trigger: triggerSummary,
+    isMutating: mutatingSummary,
+    error: errorSummary,
+  } = useSWRMutation(
+    ['/api/twitter/summary/list/pull', inputListId],
     sendRequest
   );
-  console.log('isMutating', isMutating);
-  console.log('error', error);
 
-  if (error) {
-    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('useSwr error', error);
-    }
-  }
+  const timelineArgs: ApiRequest = {
+    accessToken: session?.accessToken,
+    listId: inputListId,
+  };
 
-  console.log('quote swr data', data);
+  const {
+    data: timelineData,
+    trigger: timlineTrigger,
+    isMutating: timelineMutating,
+    error: timelineError,
+  } = useSWRMutation(
+    ['/api/internal/summary/list/fetch', timelineArgs],
+    fetchTimeline
+  );
+
   // Style page with Tailwind CSS that follows the same design as the rest of the site
-  // Include a input field for the user to enter a tweet id
-  // Show the quote tweet if the user has entered a tweet id and the quote tweet is found and a loading indicator if the quote tweet is being fetched and an error message if the quote tweet is not found
+  // Include a button to "Pull latest timeline" and a button to "Summarize" the timeline
+  // Show the summary if it exists and is not empty otherwise show a loading indicator or message that the summary is being generated and an error message if the summary is not found or is empty (i.e. no tweets in the timeline) or if the user is not signed in
+  // Include a button to submit the list you want to summarize
   if (session) {
     return (
       <Layout>
-        <Seo templateTitle='Home' />
+        <Seo templateTitle='List Summary' />
         <Seo />
 
         <main>
           <section className='bg-white'>
             <div className='layout flex flex-col items-center justify-center text-center text-black'>
               <h1 className='mt-8 text-4xl md:text-6xl'>
-                Top liked quote tweets
+                Summary of your list
               </h1>
               <p className='mt-4 md:text-lg'>
-                Enter a link to a tweet to get a list of quote tweets ordered by
-                likes
+                This page shows a summary of your selected list
               </p>
+              {/* // Input field to input the list links */}
 
-              <p className='mt-2 text-sm text-gray-700'>
-                <>
+              <div className='mt-8 flex w-full flex-col items-center justify-center md:w-1/2'>
+                <div className='mt-4 flex w-full flex-col'>
                   <input
+                    id='list-link'
+                    name='list-link'
                     type='text'
-                    className='mt-2 rounded-md border border-gray-300 p-2'
-                    placeholder='Enter a tweet id'
-                    value={inputTweetId}
-                    onChange={(e) => setInputTweetId(e.target.value)}
+                    className='mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                    placeholder='Enter a list link: https://twitter.com/i/lists/...'
+                    value={inputListId}
+                    onChange={(e) => setInputListId(e.target.value)}
                   />
-                  <button
-                    className='mt-2 rounded-md border border-gray-300 p-2'
-                    onClick={() => {
-                      trigger(inputTweetId);
-                    }}
-                  >
-                    Get Quote Tweet
-                  </button>
-                </>
-              </p>
-              <p className='mt-2 text-sm text-gray-700'>
-                {isMutating ? 'Loading...' : ''}
-              </p>
-              <p className='mt-2 text-sm text-gray-700'>
-                {userError ? userError : ''}
-              </p>
-              <span className='mt-2 text-sm text-gray-700'>
-                {data && data.data && (
-                  <ul>
-                    {data.data.map((value: any, index: any) => {
-                      return (
-                        <>
-                          <li key={index}>
-                            <Tweet id={value.id} />
-                          </li>
-                          <br></br>
-                        </>
-                      );
-                    })}
-                  </ul>
-                )}
-              </span>
+                </div>
+              </div>
+
+              <div className='mt-8'>
+                <ButtonLink
+                  href='/summary_list'
+                  className='rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700'
+                  onClick={() => triggerSummary(inputListId)}
+                >
+                  Summarize
+                </ButtonLink>
+              </div>
+
+              <div className='mt-8'>
+                <h4 className='text-1xl mt-8 md:text-2xl'>
+                  <div
+                    dangerouslySetInnerHTML={{ __html: pullSummary?.summary }}
+                    style={{ whiteSpace: 'pre-line' }}
+                  />
+                </h4>
+                <p className='mt-4 md:text-lg'>
+                  {pullSummary?.summary == '' ? 'No summary yet' : ''}
+                </p>
+              </div>
+              <div className='mt-8'>
+                <h2 className='mt-8 text-4xl md:text-6xl'>
+                  {mutatingSummary ? 'Summarizing...' : ''}
+                </h2>
+              </div>
+              <div className='mt-8'>
+                <h2 className='mt-8 text-4xl md:text-6xl'>
+                  {timelineMutating ? 'Fetching timeline...' : ''}
+                </h2>
+              </div>
+              <div className='mt-8'>
+                <h2 className='mt-4 text-red-500 md:text-lg'>
+                  {errorSummary
+                    ? 'Summary error \n' +
+                      errorSummary.status +
+                      '\n' +
+                      errorSummary.info
+                    : ''}
+                </h2>
+              </div>
+
+              <div className='mt-8'>
+                <h2 className='mt-4 text-red-500 md:text-lg'>
+                  {timelineError
+                    ? 'Timeline error \n' +
+                      timelineError.status +
+                      '\n' +
+                      timelineError.info
+                    : ''}
+                </h2>
+              </div>
             </div>
           </section>
         </main>
@@ -138,7 +216,7 @@ export default function HomePage() {
           <section className='bg-white'>
             <div className='layout flex flex-col items-center justify-center text-center text-black'>
               <h1 className='mt-8 text-4xl md:text-6xl'>
-                Top liked quote tweet
+                Summary of your timeline
               </h1>
               <p className='mt-4 md:text-lg'>You are currently not signed in</p>
               <p className='mt-2 text-sm text-gray-700'>

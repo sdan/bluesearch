@@ -3,12 +3,47 @@ import { components } from 'twitter-api-sdk/dist/types';
 type Tweet = components['schemas']['Tweet'];
 const prisma = new PrismaClient();
 
+// API Handler is just for test, import this function into your API route
 export default async function handle(req: any, res: any) {
   console.log('in api pull');
   console.log('req.body', req.body);
-  const { accessToken, twtrId } = req.body;
-  const returnTweets = await PullPromptTweets(twtrId);
+  const { accessToken, listId } = req.body;
+  const returnTweets = await PullPromptListTweets(listId);
   res.status(200).json(returnTweets);
+}
+
+export async function PullPromptListTweets(listId: any) {
+  let tweetlist: any = [];
+
+  console.log("session exists and user's list id exists");
+  const prisma = new PrismaClient();
+
+  tweetlist = await prisma.listTweets.findMany({
+    where: {
+      listId: listId,
+      createdAt: {
+        // Last day
+        gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+      },
+    },
+    select: {
+      text: true,
+      author: true,
+    },
+  });
+
+  console.log('twtrId in API', listId);
+  console.log('twts', tweetlist[0]);
+
+  const returnTweets: any = [];
+  // Make array of tweets
+  tweetlist.forEach((tweet: any) => {
+    returnTweets.push(tweet.text);
+  });
+
+  console.log('returnTweets', returnTweets);
+
+  return returnTweets;
 }
 
 export async function PullPromptTweets(twtrId: any) {

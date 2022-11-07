@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "eslint src --fix && yarn format",
-    "lint:strict": "eslint --max-warnings=1000 src",
+    "lint:strict": "eslint --max-warnings=10000 src",
     "typecheck": "tsc --noEmit --incremental false",
     "test:watch": "jest --watch",
     "test": "jest",
@@ -71,7 +71,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
-      "eslint --max-warnings=1000",
+      "eslint --max-warnings=10000",
       "prettier -w"
     ],
     "src/**/*.{json,css,scss,md}": [
