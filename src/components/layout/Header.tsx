@@ -47,6 +47,11 @@ export default function Header() {
                     Summary of your TL
                   </a>
                 </Link>
+                <Link href='/summary_list'>
+                  <a className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'>
+                    Summary of a list
+                  </a>
+                </Link>
                 <button
                   onClick={() => signOut()}
                   className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'

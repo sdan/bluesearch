@@ -173,7 +173,7 @@ export default function HomePage() {
   } else {
     return (
       <Layout>
-        <Seo templateTitle='Home' />
+        <Seo templateTitle='Summary of your timeline' />
         <Seo />
 
         <main>
