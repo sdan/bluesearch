@@ -1,4 +1,4 @@
-// Write a handler to return a fetch to https://api.tanager.app/api/internal/top_liked/fetch
+// Write a handler to return a fetch to https://api.sparrowsearch.xyz/api/internal/top_liked/fetch
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
