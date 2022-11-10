@@ -3,19 +3,19 @@ import { useRouter } from 'next/router';
 
 // !STARTERCONF Change these default meta
 const defaultMeta = {
-  title: 'Tanager',
-  siteName: 'Tanager',
+  title: 'SparrowSearch',
+  siteName: 'SparrowSearch',
   description:
-    'Tanager is a Twitter client that surfaces the best tweets from your favorite people.',
+    'SparrowSearch is a Twitter client that surfaces the best tweets from your favorite people.',
   /** Without additional '/' on the end, e.g. https://theodorusclarence.com */
-  url: 'https://tanager.app',
+  url: 'https://sparrowsearch.xyz',
   type: 'website',
   robots: 'follow, index',
   /**
    * No need to be filled, will be populated with openGraph function
    * If you wish to use a normal image, just specify the path below
    */
-  image: 'https://tanager.app/images/large-og.png',
+  image: 'https://sparrowsearch.xyz/images/large-og.png',
 };
 
 type SeoProps = {

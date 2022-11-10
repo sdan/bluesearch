@@ -9,5 +9,5 @@ jobs:
       - name: Call our API route
         run: |
           curl --request POST \
-          --url 'https://tanager.app/api/twitter/cron' \
+          --url 'https://sparrowsearch.xyz/api/twitter/cron' \
           --header 'Authorization: Bearer ${{ secrets.CRON_SECRET_KEY }}'

@@ -22,6 +22,7 @@ model Account {
   user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   LikedTweets       LikedTweets[]
   TimelineTweets    TimelineTweets[]
+  Following        Following[]
 
   @@unique([provider, providerAccountId])
 }
@@ -84,6 +85,20 @@ model LikedTweets {
   retweets  Int      @default(0)
   entities  Json?
   createdAt DateTime
+  userId    String
+  user      Account  @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
+}
+
+model Following {
+  id        String   @id @unique @default(cuid())
+  username  String
+  name      String
+  bio      String
+  location  String
+  url       String
+  followers  Int      @default(0)
+  following  Int      @default(0)
+  likes     Int      @default(0)
   userId    String
   user      Account  @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
 }

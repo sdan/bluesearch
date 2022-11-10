@@ -1,5 +1,3 @@
-// Write a handler to return a fetch to https://api.tanager.app/api/internal/top_liked/fetch
-
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(
@@ -13,7 +11,7 @@ export default async function handle(
   // Fetch from API
 
   let data = await fetch(
-    'https://api.sparrowsearch.xyz/api/external/engagement/fetch',
+    'https://api.sparrowsearch.xyz/api/external/following/fetch',
     {
       method: 'POST',
       headers: {
@@ -24,7 +22,7 @@ export default async function handle(
   );
 
   data = await data.json();
-  console.log('succesfully top liked fetched data', data);
+  console.log('succesfully following list fetched data', data);
 
   res.status(200).json(data);
 }

@@ -13,7 +13,7 @@ export default async function handle(
   // Fetch from API
 
   let data = await fetch(
-    'https://api.tanager.app/api/external/top_liked/fetch',
+    'https://api.sparrowsearch.xyz/api/external/top_liked/fetch',
     {
       method: 'POST',
       headers: {

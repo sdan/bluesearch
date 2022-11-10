@@ -59,7 +59,7 @@ export async function RefreshTokens(
   const authClient = new auth.OAuth2User({
     client_id: process.env.TWITTER_CLIENT_ID!,
     client_secret: process.env.TWITTER_CLIENT_SECRET!,
-    callback: 'http://tanager.app/api/auth/callback/twitter',
+    callback: 'http://sparrowsearch.xyz/api/auth/callback/twitter',
     scopes: [],
     token: {
       refresh_token: refreshToken,
