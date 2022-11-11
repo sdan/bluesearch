@@ -89,7 +89,7 @@ export default function HomePage() {
   );
 
   const { data, trigger, isMutating, error } = useSWRMutation(
-    ['/api/twitter/following/summary', followingArgs],
+    ['/api/internal/following/summary', followingArgs],
     sendRequest
   );
   console.log('isMutating', isMutating);
