@@ -54,6 +54,11 @@ export default function Header() {
                     Summary of a list
                   </a>
                 </Link>
+                <Link href='/following'>
+                  <a className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'>
+                    Smart search through following
+                  </a>
+                </Link>
                 <button
                   onClick={() => signOut()}
                   className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'
