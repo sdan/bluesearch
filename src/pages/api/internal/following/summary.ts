@@ -22,7 +22,7 @@ export default async function handle(
   );
 
   data = await data.json();
-  console.log('succesfully following list fetched data', data);
+  console.log('succesfully following list summar data', data);
 
   res.status(200).json(data);
 }
