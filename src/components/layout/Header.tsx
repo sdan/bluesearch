@@ -11,7 +11,7 @@ const signed_links = [
 
 export default function Header() {
   const { data: session } = useSession();
-  console.log('session header', session);
+  // console.log('session header', session);
   // Design a header that follows the current design that shows a sign out button if the user is signed in, and a sign in button if the user is signed out.
   // Include a link to Top liked tweets and a link to Top liked quote tweets.
   // The styling should be similar to the current design.

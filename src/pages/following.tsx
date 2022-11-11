@@ -15,33 +15,81 @@ export default function HomePage() {
   const [userError, setUserError] = React.useState('');
   const [searchQuery, setSearchQuery] = React.useState('');
 
-  async function sendRequest(url: any, args: any) {
-    console.log('sendRequest url', url);
+  // Call frontend endpoint to pull following and summarize with GPT3
+  async function sendRequest(args: any) {
     console.log('sendRequest args', args);
 
-    console.log('sendRequest session', session?.accessToken);
-    console.log('sendRequest session', session);
-
-    if (args.arg && session && session.accessToken) {
-      const fetchQuote = await fetch('/api/twitter/following', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          accessToken: session.accessToken,
-          searchQuery: args.arg,
-        }),
-      });
-      const quoteData = await fetchQuote.json();
-      console.log('quote fetch data', quoteData);
-      return quoteData;
-    } else {
-      console.log('no args');
-      setUserError('try signing again');
+    // Checks if we have pulled following before
+    const checkPull = await fetch('/api/twitter/following/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        twtrId: args[1].twtrId,
+      }),
+    });
+    const checkFollowers = await checkPull.json();
+    if (checkFollowers < 10) {
+      console.log('checkFollowers', checkFollowers);
+      followingTrigger();
     }
+
+    // If we have pulled following before, then we can pull summary
+    const pullSummary = await fetch(args[0], {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: args[1].query,
+        twtrId: args[1].twtrId,
+      }),
+    });
+    const summaryData = await pullSummary.json();
+    console.log('following fetch data', summaryData);
+    return summaryData;
   }
 
+  async function fetchFollowing(args: any) {
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+      console.log('F FOLLOW args 2', args);
+    }
+
+    return await fetch(args[0], {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accessToken: args[1].accessToken,
+        twtrId: args[1].twtrId,
+      }),
+    }).then(async (res) => {
+      if (!res.ok) {
+        const err = new Error('Following fetch response was not ok');
+        err.info = await res.json();
+        err.status = res.status;
+        console.log('FOLLOWING ERROR', err);
+        throw err;
+      }
+      return res.json();
+    });
+  }
+
+  // Fetch following list and inserts into db
+  const followingArgs: ApiRequest = {
+    accessToken: session?.accessToken,
+    twtrId: session?.twtrId,
+    query: searchQuery,
+  };
+
+  const {
+    data: followingData,
+    trigger: followingTrigger,
+    isMutating: followingMutating,
+    error: followingError,
+  } = useSWRMutation(
+    ['/api/internal/following/fetch', followingArgs],
+    fetchFollowing
+  );
+
   const { data, trigger, isMutating, error } = useSWRMutation(
-    ['/api/twitter/following', searchQuery],
+    ['/api/twitter/following/summary', followingArgs],
     sendRequest
   );
   console.log('isMutating', isMutating);
@@ -53,10 +101,9 @@ export default function HomePage() {
     }
   }
 
-  console.log('quote swr data', data);
+  console.log('following swr data', data);
   // Style page with Tailwind CSS that follows the same design as the rest of the site
   // Include a input field for the user to enter a tweet id
-  // Show the quote tweet if the user has entered a tweet id and the quote tweet is found and a loading indicator if the quote tweet is being fetched and an error message if the quote tweet is not found
   if (session) {
     return (
       <Layout>
@@ -70,10 +117,9 @@ export default function HomePage() {
                 Smart search through your following
               </h1>
               <p className='mt-4 md:text-lg'>
-                Enter something like "Pull all the artists I follow" to find all
-                the artists you follow.
+                Enter something like "who lives in SF" to find all the people
+                you follow that live in SF.
               </p>
-
               <p className='mt-2 text-sm text-gray-700'>
                 <>
                   <input
@@ -99,22 +145,12 @@ export default function HomePage() {
               <p className='mt-2 text-sm text-gray-700'>
                 {userError ? userError : ''}
               </p>
-              <span className='mt-2 text-sm text-gray-700'>
-                {data && data.data && (
-                  <ul>
-                    {data.data.map((value: any, index: any) => {
-                      return (
-                        <>
-                          <li key={index}>
-                            <Tweet id={value.id} />
-                          </li>
-                          <br></br>
-                        </>
-                      );
-                    })}
-                  </ul>
-                )}
-              </span>
+              <p className='text-left'>
+                <div
+                  dangerouslySetInnerHTML={{ __html: data?.summary }}
+                  style={{ whiteSpace: 'pre-line' }}
+                />
+              </p>
             </div>
           </section>
         </main>
@@ -130,7 +166,7 @@ export default function HomePage() {
           <section className='bg-white'>
             <div className='layout flex flex-col items-center justify-center text-center text-black'>
               <h1 className='mt-8 text-4xl md:text-6xl'>
-                Top liked quote tweet
+                Smart search through your following
               </h1>
               <p className='mt-4 md:text-lg'>You are currently not signed in</p>
               <p className='mt-2 text-sm text-gray-700'>

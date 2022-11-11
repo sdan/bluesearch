@@ -8,8 +8,35 @@ export default async function handle(req: any, res: any) {
   console.log('in api pull');
   console.log('req.body', req.body);
   const { accessToken, twtrId } = req.body;
-  const returnTweets = await PullPromptFollowing(twtrId);
+  console.log('accessToken', accessToken);
+  console.log('twtrId', twtrId);
+  const returnTweets = await TryFollowing(twtrId);
+  // const returnTweets = await PullPromptFollowing(twtrId);
   res.status(200).json(returnTweets);
+}
+
+export async function TryFollowing(twtrId: any) {
+  console.log("session exists and user's list id exists");
+  const prisma = new PrismaClient();
+
+  console.log('twtrId', twtrId);
+
+  const followcount = await prisma.account.findMany({
+    where: {
+      providerAccountId: twtrId,
+    },
+    select: {
+      _count: {
+        select: {
+          Following: true,
+        },
+      },
+    },
+  });
+
+  console.log('twtrId in API', twtrId);
+  console.log('followcount', followcount[0]._count.Following);
+  return followcount[0]._count.Following;
 }
 
 export async function PullPromptFollowing(twtrId: any) {
@@ -33,19 +60,20 @@ export async function PullPromptFollowing(twtrId: any) {
           url: true,
           followers: true,
           following: true,
-          likes: true,
+          tweets: true,
         },
       },
     },
   });
 
   console.log('twtrId in API', twtrId);
-  console.log('twts', followList[0]);
+  console.log('flwng', followList[0].Following[0]);
 
+  const parseTweets: any = followList[0].Following;
   const returnTweets: any = [];
   // Make array of tweets
-  followList.forEach((tweet: any) => {
-    returnTweets.push(tweet.text);
+  parseTweets.forEach((friend: any) => {
+    returnTweets.push([friend.name, friend.bio, friend.location]);
   });
 
   console.log('returnTweets', returnTweets);

@@ -6,7 +6,7 @@ import { PrismaClient, Prisma } from '@prisma/client';
 import { components } from 'twitter-api-sdk/dist/types';
 import { Configuration, OpenAIApi } from 'openai';
 
-import { PullPromptFollowing } from './pull';
+import { PullPromptFollowing, TryFollowing } from './pull';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -18,24 +18,23 @@ export default async function handle(
 ) {
   console.log('in api summary following pull');
   console.log('req.body', req.body);
-  const { twtrId } = req.body;
+  const { query, twtrId } = req.body;
   try {
     console.log('twtr ID', twtrId);
+    console.log('query', query);
 
-    // Pulls timeline
-    const following = await PullPromptFollowing(twtrId);
-    console.log('following', following);
+    // Pulls friends
+    const friends = await PullPromptFollowing(twtrId);
+    console.log('following', friends);
 
     // Select random group of 75 tweets from timelineTweets array
-    const randomFollowing = following.sort(() => 0.5 - Math.random());
+    const randomFollowing = friends.sort(() => 0.5 - Math.random());
     const selectedFollowing = randomFollowing.slice(0, 75);
 
-    // const sliceTweets = timelineTweets.slice(0, 75);
-
     // Generates summary
-    const summary = await GenerateSummary(selectedFollowing);
+    const summary = await RunQuery(selectedFollowing, query);
 
-    console.log('th e summary', summary);
+    console.log('following answer:', summary);
     res.status(200).json({ summary });
   } catch (err) {
     console.log('fetch err', err);
@@ -43,13 +42,21 @@ export default async function handle(
   }
 }
 
-async function GenerateSummary(tweets: any) {
+async function RunQuery(friends: any, query: any) {
   const gpt3 = new OpenAIApi(configuration);
-  const prompt = tweets.join('\n\n');
+  // Join friends array and append tags to each friend
+  const prompt = friends
+    .map(
+      (friend: any) =>
+        `NAME: ${friend[0]}, BIO: ${friend[1]}, LOCATION: ${friend[2]}  `
+    )
+    .join('\n');
   // Add text to prompt
   const promptText =
     prompt +
-    '\n\n ### \nHere is a feed of tweets. Give me a brief summary of what the particularly newsworthy tweets are about. Be specifc which tweets.';
+    '\n\n ### \nHere is a list of people listed with their name, biography, and location. ' +
+    query +
+    ' from this list. Be specific and reference direct people.';
 
   console.log('here is prompt', promptText);
   const response = await gpt3.createCompletion({

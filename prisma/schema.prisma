@@ -92,13 +92,13 @@ model LikedTweets {
 model Following {
   id        String   @id @unique @default(cuid())
   username  String
-  name      String
-  bio      String
-  location  String
-  url       String
+  name      String?
+  bio      String?
+  location  String?
+  url       String?
   followers  Int      @default(0)
   following  Int      @default(0)
-  likes     Int      @default(0)
+  tweets     Int?      @default(0)
   userId    String
   user      Account  @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
 }
