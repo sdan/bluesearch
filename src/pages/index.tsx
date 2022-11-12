@@ -18,8 +18,8 @@ export default function HomePage() {
         <div className='-mt-24 flex min-h-screen flex-col items-center justify-center bg-gray-50 py-2 text-center sm:py-12'>
           <h1 className='text-4xl font-bold'>Sign in with Twitter</h1>
           <p className='mt-3 text-base text-gray-500 sm:mx-auto sm:mt-5 sm:max-w-xl sm:text-lg md:mt-5 md:text-xl lg:mx-0'>
-            SparrowSearch is a Twitter client that helps you find the best
-            tweets and people. Sign in with Twitter to get started.
+            BlueSearch is a Twitter client that helps you find the best tweets
+            and people. Sign in with Twitter to get started.
           </p>
           <div className='mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start'>
             <div className='rounded-md shadow'>
@@ -54,10 +54,10 @@ export default function HomePage() {
           <br></br>
 
           <h1 className='text-4xl font-bold'>
-            Welcome to SparrowSearch, {session.user!.name}!
+            Welcome to BlueSearch, {session.user!.name}!
           </h1>
           <p className='mt-3 text-base text-gray-500 sm:mx-auto sm:mt-5 sm:max-w-xl sm:text-lg md:mt-5 md:text-xl lg:mx-0'>
-            You can now use the suite of SparrowSearch features to find the best
+            You can now use the suite of BlueSearch features to find the best
             tweets and people on Twitter.
           </p>
           <div className='mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start'>

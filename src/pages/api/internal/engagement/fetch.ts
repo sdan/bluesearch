@@ -1,5 +1,3 @@
-// Write a handler to return a fetch to https://api.sparrowsearch.xyz/api/internal/top_liked/fetch
-
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(
@@ -13,7 +11,7 @@ export default async function handle(
   // Fetch from API
 
   let data = await fetch(
-    'https://api.sparrowsearch.xyz/api/external/engagement/fetch',
+    'https://api.bluesearch.xyz/api/external/engagement/fetch',
     {
       method: 'POST',
       headers: {

@@ -3,19 +3,19 @@ import { useRouter } from 'next/router';
 
 // !STARTERCONF Change these default meta
 const defaultMeta = {
-  title: 'SparrowSearch',
-  siteName: 'SparrowSearch',
+  title: 'BlueSearch',
+  siteName: 'BlueSearch',
   description:
-    'SparrowSearch is a Twitter client that surfaces the best tweets from your favorite people.',
+    'BlueSearch is a Twitter client that surfaces the best tweets from your favorite people.',
   /** Without additional '/' on the end, e.g. https://theodorusclarence.com */
-  url: 'https://sparrowsearch.xyz',
+  url: 'https://BlueSearch.xyz',
   type: 'website',
   robots: 'follow, index',
   /**
    * No need to be filled, will be populated with openGraph function
    * If you wish to use a normal image, just specify the path below
    */
-  image: 'https://sparrowsearch.xyz/images/large-og.png',
+  image: 'https://BlueSearch.xyz/images/large-og.png',
 };
 
 type SeoProps = {

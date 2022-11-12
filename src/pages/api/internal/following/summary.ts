@@ -11,7 +11,7 @@ export default async function handle(
   // Fetch from API
 
   let data = await fetch(
-    'https://api.sparrowsearch.xyz/api/external/following/summary',
+    'https://api.bluesearch.xyz/api/external/following/summary',
     {
       method: 'POST',
       headers: {

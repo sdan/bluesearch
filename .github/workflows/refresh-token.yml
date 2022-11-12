@@ -9,5 +9,5 @@ jobs:
       - name: Call our API route
         run: |
           curl --request POST \
-          --url 'https://sparrowsearch.xyz/api/twitter/token' \
+          --url 'https://bluesearch.xyz/api/twitter/token' \
           --header 'Authorization: Bearer ${{ secrets.CRON_SECRET_KEY }}'

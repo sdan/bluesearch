@@ -22,9 +22,7 @@ export default function Header() {
           <nav className='flex items-center justify-between py-4'>
             <div className='flex items-center'>
               <Link href='/'>
-                <a className='text-2xl font-bold text-gray-800'>
-                  SparrowSearch
-                </a>
+                <a className='text-2xl font-bold text-gray-800'>BlueSearch</a>
               </Link>
             </div>
             <div className='flex items-center'>
@@ -78,9 +76,7 @@ export default function Header() {
           <nav className='flex items-center justify-between py-4'>
             <div className='flex items-center'>
               <Link href='/'>
-                <a className='text-2xl font-bold text-gray-800'>
-                  SparrowSearch
-                </a>
+                <a className='text-2xl font-bold text-gray-800'>BlueSearch</a>
               </Link>
             </div>
             <div className='flex items-center'>
