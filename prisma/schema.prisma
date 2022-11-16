@@ -99,6 +99,8 @@ model Following {
   followers  Int      @default(0)
   following  Int      @default(0)
   tweets     Int?      @default(0)
+  latestTweet  DateTime?
+  latestLikes  DateTime?
   userId    String
   user      Account  @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
 }
