@@ -73,7 +73,7 @@ export default function HomePage() {
   }
   if (data) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('tweetsFromDB', data[0]);
+      console.log('tweetsFromDB', data['0']);
     }
   } else {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
@@ -130,7 +130,50 @@ export default function HomePage() {
             Here are the people you follow who have not been active recently
           </p>
 
-          {data && <p>{data}</p>}
+          <div className=' flex flex-col py-2'>
+            {data[0]['Following'].map((user: any) => (
+              <div
+                className='flex flex-col items-center justify-center rounded-lg bg-white p-4 shadow-md '
+                key={user.id}
+              >
+                <div className='flex flex-col items-center justify-center'>
+                  <p className='text-xl font-bold'>{user.name}</p>
+                  <p className='text-gray-500'>@{user.username}</p>
+                </div>
+                <div className='flex flex-col items-center justify-center'>
+                  <p className='text-xl font-bold'>{user.latestLikes} likes</p>
+                  <p className='text-gray-500'>
+                    {new Date(user.latestLikes).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className='flex items-center justify-center'>
+                  {new Date(user.latestLikes) <
+                  new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) ? (
+                    <button className='rounded bg-green-500 py-2 px-4 font-bold text-white'>
+                      Unfollow
+                    </button>
+                  ) : (
+                    <button className='rounded bg-red-500 py-2 px-4 font-bold text-white'>
+                      Active
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* {data && (
+            <div className='flex flex-col items-center justify-center py-2'>
+              <div className='flex flex-col items-center justify-center py-2'>
+                {data[0]['Following'].map((user: any) => (
+                  <div key={user.id}>
+                    <p>{user.name}</p>
+                    <p>{user.latestLikes}</p>
+                    <p>{user.latestTweet}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )} */}
         </div>
       </Layout>
     );
