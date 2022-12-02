@@ -81,7 +81,7 @@ export default function Header() {
             </div>
             <div className='flex items-center'>
               <button
-                onClick={() => signIn()}
+                onClick={() => signIn('twitter')}
                 className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'
               >
                 Sign in

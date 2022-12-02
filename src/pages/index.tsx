@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { Container, Row, Card, Button } from 'react-bootstrap';
+
 import Layout from '@/components/layout/Layout';
 import ButtonLink from '@/components/links/ButtonLink';
 import Seo from '@/components/Seo';

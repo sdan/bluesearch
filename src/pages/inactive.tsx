@@ -7,6 +7,7 @@ import useSWRMutation from 'swr/mutation';
 import Layout from '@/components/layout/Layout';
 import Seo from '@/components/Seo';
 import { Session } from 'next-auth';
+import moment from 'moment';
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -54,7 +55,7 @@ export default function HomePage() {
   // keep fetching from db
 
   // initialize variable args as type ApiRequest
-  const pullLikesArgs: ApiRequest = {
+  const pullFollowerActivityArgs: ApiRequest = {
     accessToken: session?.accessToken,
     twtrId: session?.twtrId,
   };
@@ -63,46 +64,41 @@ export default function HomePage() {
   }
 
   const { data, error } = useSWR(
-    { url: '/api/twitter/inactive/pull', args: pullLikesArgs },
+    { url: '/api/twitter/inactive/pull', args: pullFollowerActivityArgs },
     pullStats
   );
   if (error) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('error', error);
+      console.log('inactive error', error);
     }
   }
   if (data) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('tweetsFromDB', data['0']);
+      console.log('tweetsFromDB', data);
     }
   } else {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('no data');
+      console.log('no inactive data', data);
     }
   }
 
-  const fetchTweetArgs: ApiRequest = {
+  const fetchStatsArgs: ApiRequest = {
     accessToken: session?.accessToken,
     twtrId: session?.twtrId,
   };
-  // const { data: fetchedTweets, error: fetchedTweetError } = useSWR(
-  //   { url: '/api/twitter/engagement/fetch', args: fetchTweetArgs },
-  //   fetchLikes
-  // );
-
   const {
-    data: fetchedTweets,
+    data: fetchedStats,
     trigger,
     isMutating,
-    error: fetchedTweetError,
+    error: fetchedStatsError,
   } = useSWRMutation(
-    ['/api/internal/engagement/fetch', fetchTweetArgs],
+    ['/api/internal/inactive/fetch', fetchStatsArgs],
     fetchLikes
   );
 
   if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-    console.log('fetchedTweet Error', fetchedTweetError);
-    console.log('fetchedTweets', fetchedTweets);
+    console.log('fetchedTweet Error', fetchedStatsError);
+    console.log('fetchedTweets', fetchedStats);
   }
   console.log('tweet data', data);
   // Design the Top Liked Tweets page with the tweets from the database with a similar style to the rest of the site. Make sure to include a loading state and error state. You can use the `useSWR` hook to fetch the data from the database.
@@ -130,50 +126,40 @@ export default function HomePage() {
             Here are the people you follow who have not been active recently
           </p>
 
-          <div className=' flex flex-col py-2'>
-            {data[0]['Following'].map((user: any) => (
-              <div
-                className='flex flex-col items-center justify-center rounded-lg bg-white p-4 shadow-md '
-                key={user.id}
-              >
-                <div className='flex flex-col items-center justify-center'>
-                  <p className='text-xl font-bold'>{user.name}</p>
-                  <p className='text-gray-500'>@{user.username}</p>
-                </div>
-                <div className='flex flex-col items-center justify-center'>
-                  <p className='text-xl font-bold'>{user.latestLikes} likes</p>
-                  <p className='text-gray-500'>
-                    {new Date(user.latestLikes).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className='flex items-center justify-center'>
-                  {new Date(user.latestLikes) <
-                  new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) ? (
-                    <button className='rounded bg-green-500 py-2 px-4 font-bold text-white'>
-                      Unfollow
-                    </button>
-                  ) : (
-                    <button className='rounded bg-red-500 py-2 px-4 font-bold text-white'>
-                      Active
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
+          <div className='flex flex-col items-center justify-center py-2'>
+            <button
+              className='rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700'
+              onClick={() => trigger(fetchStatsArgs)}
+            >
+              Fetch users
+            </button>
+            {isMutating && <p>Fetching users...</p>}
           </div>
-          {/* {data && (
-            <div className='flex flex-col items-center justify-center py-2'>
-              <div className='flex flex-col items-center justify-center py-2'>
-                {data[0]['Following'].map((user: any) => (
-                  <div key={user.id}>
-                    <p>{user.name}</p>
-                    <p>{user.latestLikes}</p>
-                    <p>{user.latestTweet}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )} */}
+          <div className='flex w-full flex-1 flex-col items-center justify-center px-20 text-center'>
+            {data ? (
+              data.map((user) => (
+                <div
+                  key={user.id}
+                  className='flex flex-row justify-center space-x-4'
+                >
+                  <img
+                    src={user.profile_image_url}
+                    className='h-16 w-16 rounded-full'
+                  />
+                  <p className='font-bold'>{user.name}</p>
+                  <p className='font-bold'>{user.username}</p>
+                  <p className='font-bold'>
+                    {moment(user.latestLikes).fromNow()}
+                  </p>
+                  {/* <button className='rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700'>
+                    Unfollow
+                  </button> */}
+                </div>
+              ))
+            ) : (
+              <p>Loading...</p>
+            )}
+          </div>
         </div>
       </Layout>
     );

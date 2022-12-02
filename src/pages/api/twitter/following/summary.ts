@@ -25,7 +25,7 @@ export default async function handle(
 
     // Pulls friends
     const friends = await PullPromptFollowing(twtrId);
-    console.log('following', friends);
+    console.log('summary pulling following', friends);
 
     // Select random group of 75 tweets from timelineTweets array
     const randomFollowing = friends.sort(() => 0.5 - Math.random());

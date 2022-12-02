@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 
 // API Handler is just for test, import this function into your API route
 export default async function handle(req: any, res: any) {
-  console.log('in api pull');
+  console.log('in inactive api pull');
   console.log('req.body', req.body);
   const { accessToken, twtrId } = req.body;
-  console.log('accessToken', accessToken);
+  console.log('accessToken inactive pull frontend', accessToken);
   console.log('twtrId', twtrId);
   const returnTweets = await PullFollowActivity(twtrId);
   // const returnTweets = await PullPromptFollowing(twtrId);
@@ -19,14 +19,15 @@ export async function PullFollowActivity(twtrId: any) {
   console.log("session exists and user's list id exists");
   const prisma = new PrismaClient();
 
-  console.log('twtrId', twtrId);
-
-  const followActivity = await prisma.account.findMany({
+  const followActivity = await prisma.account.findFirst({
     where: {
       providerAccountId: twtrId,
     },
     select: {
       Following: {
+        orderBy: {
+          latestLikes: 'asc',
+        },
         select: {
           id: true,
           username: true,
@@ -38,7 +39,7 @@ export async function PullFollowActivity(twtrId: any) {
     },
   });
 
-  console.log('twtrId in API', twtrId);
-  console.log('followActivity', followActivity);
-  return followActivity;
+  console.log('twtrId in used for follower activity', twtrId);
+  console.log('followActivity', followActivity!['Following']);
+  return followActivity!['Following'];
 }

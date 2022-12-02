@@ -22,16 +22,19 @@
     "@prisma/client": "^4.5.0",
     "@types/next-auth": "^3.15.0",
     "@types/twitter": "^1.7.1",
+    "bootstrap": "^5.2.3",
     "clsx": "^1.2.1",
     "cookie": "^0.5.0",
     "date-fns": "^2.29.3",
     "dotenv-cli": "^6.0.0",
     "global": "^4.4.0",
     "html-react-parser": "^3.0.4",
+    "moment": "^2.29.4",
     "next": "^12.2.5",
     "next-auth": "^4.10.3",
     "openai": "^3.1.0",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.6.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.4.0",
     "react-static-tweets": "^0.8.0",
@@ -71,7 +74,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
-      "eslint --max-warnings=10000",
+      "eslint",
       "prettier -w"
     ],
     "src/**/*.{json,css,scss,md}": [
