@@ -10,13 +10,16 @@ export default async function handle(
 
   // Fetch from API
 
-  let data = await fetch('http://localhost:3001/api/external/inactive/fetch', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ accessToken, twtrId }),
-  });
+  let data = await fetch(
+    'http://api.bluesearch.xyz/api/external/inactive/fetch',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ accessToken, twtrId }),
+    }
+  );
 
   data = await data.json();
   console.log('succesfully following list fetched data', data);
