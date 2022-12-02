@@ -57,6 +57,11 @@ export default function Header() {
                     Smart search through following
                   </a>
                 </Link>
+                <Link href='/inactive'>
+                  <a className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'>
+                    Inactive friends
+                  </a>
+                </Link>
                 <button
                   onClick={() => signOut()}
                   className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'
