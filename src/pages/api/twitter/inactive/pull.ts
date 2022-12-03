@@ -40,6 +40,5 @@ export async function PullFollowActivity(twtrId: any) {
   });
 
   console.log('twtrId in used for follower activity', twtrId);
-  console.log('followActivity', followActivity!['Following']);
   return followActivity!['Following'];
 }

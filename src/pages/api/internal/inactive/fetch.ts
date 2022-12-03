@@ -10,8 +10,15 @@ export default async function handle(
 
   // Fetch from API
 
+  console.log(
+    'frontend calling API to run long running tasks, accessToken/twtrId:',
+    accessToken,
+    twtrId
+  );
+
   let data = await fetch(
-    'http://api.bluesearch.xyz/api/external/inactive/fetch',
+    'https://api.bluesearch.xyz/api/external/inactive/fetch',
+    // 'http://localhost:3001/api/external/inactive/fetch',
     {
       method: 'POST',
       headers: {

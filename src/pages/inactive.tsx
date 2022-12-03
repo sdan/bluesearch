@@ -32,11 +32,11 @@ export default function HomePage() {
     }).then((res) => res.json());
   }
 
-  function fetchLikes(args: any) {
+  function fetchStats(args: any) {
     // console.log('access token fetcher', session?.accessToken, session?.twtrId);
     // console.log('arg.accessToken', arg.accessToken);
     // console.log('arg.twtrId', arg.twtrId);
-    console.log('FETCHLIKE args', args);
+    console.log('fetchStats args', args);
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
       console.log('LT args', session?.accessToken);
       console.log('LT twtrid', session?.twtrId);
@@ -93,7 +93,7 @@ export default function HomePage() {
     error: fetchedStatsError,
   } = useSWRMutation(
     ['/api/internal/inactive/fetch', fetchStatsArgs],
-    fetchLikes
+    fetchStats
   );
 
   if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
