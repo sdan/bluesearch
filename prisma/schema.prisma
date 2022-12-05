@@ -104,3 +104,19 @@ model Following {
   userId    String
   user      Account  @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
 }
+
+// Metrics model to display followers and following metrics over time
+model Metrics {
+  userId   String @id
+  username  String
+  name      String?
+  bio      String?
+  location  String?
+  url       String?
+  followers  Int      @default(0)
+  following  Int      @default(0)
+  latestFollowers  Int[]
+  latestFollowing  Int[]
+  fetchedFollowers DateTime[]
+  fetchedFollowing DateTime[]
+}
