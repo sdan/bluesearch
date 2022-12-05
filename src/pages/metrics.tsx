@@ -228,13 +228,23 @@ export default function HomePage() {
               </h1>
 
               {user.latestFollowers.length > 1 ? (
-                <h2 className='text-center text-xl font-bold  text-green-500'>
-                  +
+                <>
                   {user.latestFollowers[user.latestFollowers.length - 1] -
-                    user.latestFollowers[user.latestFollowers.length - 2]}{' '}
-                  followers from{' '}
-                  {user.fetchedFollowers[user.fetchedFollowers.length - 2]}
-                </h2>
+                    user.latestFollowers[0] >
+                  0 ? (
+                    <h2 className='text-center text-xl font-bold  text-green-500'>
+                      {user.latestFollowers[user.latestFollowers.length - 1] -
+                        user.latestFollowers[0]}{' '}
+                      followers from {user.fetchedFollowers[0]}
+                    </h2>
+                  ) : (
+                    <h2 className='text-center text-xl font-bold  text-red-500'>
+                      {user.latestFollowers[user.latestFollowers.length - 1] -
+                        user.latestFollowers[0]}{' '}
+                      followers from {user.fetchedFollowers[0]}
+                    </h2>
+                  )}
+                </>
               ) : (
                 <> </>
               )}
