@@ -8,6 +8,7 @@ import useSWRMutation from 'swr/mutation';
 import useSWRImmutable from 'swr/immutable';
 import { PrismaClient } from '@prisma/client';
 import { Tweet } from 'react-static-tweets';
+import useSWR from 'swr';
 
 type Props = {
   tweetlist: any[];
@@ -29,6 +30,21 @@ export default function HomePage() {
 
   //inputtweetid react state of type Input
   //   const [inputTweetId, setInputTweetId] = React.useState('');
+
+  const tweetRenderer = (id: string) =>
+    fetch(`/api/get-tweet-ast/${id}`).then((r) => r.json());
+
+  const DynamicTweet: React.FC<{ tweetId: string }> = ({ tweetId }) => {
+    // console.log('dynamic tweet id', tweetId);
+    const { data: tweetAst } = useSWR(tweetId, tweetRenderer);
+    if (!tweetAst) return null;
+
+    return (
+      <>
+        <Tweet id={tweetId} ast={tweetAst} />
+      </>
+    );
+  };
 
   async function sendRequest(url: any, args: any) {
     console.log('sendRequest url', url);
@@ -95,7 +111,7 @@ export default function HomePage() {
                   <input
                     type='text'
                     className='mt-2 rounded-md border border-gray-300 p-2'
-                    placeholder='Enter a tweet id'
+                    placeholder='https://twitter.com/elonmusk/status/1599228101547868160'
                     value={inputTweetId}
                     onChange={(e) => setInputTweetId(e.target.value)}
                   />
@@ -122,7 +138,7 @@ export default function HomePage() {
                       return (
                         <>
                           <li key={index}>
-                            <Tweet id={value.id} />
+                            <DynamicTweet tweetId={value.id} />
                           </li>
                           <br></br>
                         </>
