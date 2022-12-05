@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation';
 import useSWR from 'swr';
 
 import { PrismaClient } from '@prisma/client';
-import { Tweet } from 'react-static-tweets';
+import { Tweet, TwitterContextProvider } from 'react-static-tweets';
 
 type Props = {
   tweetlist: any[];
@@ -16,6 +16,21 @@ type Props = {
 
 export default function HomePage() {
   const { data: session } = useSession();
+
+  const tweetRenderer = (id: string) =>
+    fetch(`/api/get-tweet-ast/${id}`).then((r) => r.json());
+
+  const DynamicTweet: React.FC<{ tweetId: string }> = ({ tweetId }) => {
+    // console.log('dynamic tweet id', tweetId);
+    const { data: tweetAst } = useSWR(tweetId, tweetRenderer);
+    if (!tweetAst) return null;
+
+    return (
+      <>
+        <Tweet id={tweetId} ast={tweetAst} />
+      </>
+    );
+  };
 
   type ApiRequest = {
     accessToken: any;
@@ -182,11 +197,7 @@ export default function HomePage() {
           <div className='mt-4'>
             {data ? (
               data.TimelineTweets.map((tweet: any) => (
-                <Tweet
-                  key={tweet.id}
-                  id={tweet.id}
-                  className='mt-4 rounded-md border border-gray-300 p-4'
-                />
+                <DynamicTweet tweetId={tweet.id} key={tweet.id} />
               ))
             ) : (
               <p>Loading...</p>

@@ -20,6 +20,8 @@ export async function PullTweets(twtrId: any) {
   const prisma = new PrismaClient();
 
   //find tweets by user id and sort by likes in descending order (most likes first) for the past 24 hours
+  //only return the top 100 tweets
+
   tweetlist = await prisma.account.findFirst({
     where: {
       providerAccountId: twtrId,
@@ -35,6 +37,7 @@ export async function PullTweets(twtrId: any) {
             gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
           },
         },
+        take: 10,
       },
     },
   });
