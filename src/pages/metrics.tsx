@@ -211,6 +211,11 @@ export default function HomePage() {
           >
             Hard pull metrics
           </button>
+          {isMutating && (
+            <p className='mt-4 text-xl text-gray-500'>
+              Refreshing public metrics...
+            </p>
+          )}
         </div>
         {metricsData ? (
           metricsData.map((user: any) => (
