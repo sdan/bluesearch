@@ -62,6 +62,11 @@ export default function Header() {
                     Inactive friends
                   </a>
                 </Link>
+                <Link href='/metrics'>
+                  <a className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'>
+                    Twitter Metrics
+                  </a>
+                </Link>
                 <button
                   onClick={() => signOut()}
                   className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'
