@@ -80,26 +80,6 @@ export default function Header() {
       </header>
     );
   } else {
-    return (
-      <header className='bg-blue-100'>
-        <div className='container mx-auto px-4'>
-          <nav className='flex items-center justify-between py-4'>
-            <div className='flex items-center'>
-              <Link href='/'>
-                <a className='text-2xl font-bold text-gray-800'>BlueSearch</a>
-              </Link>
-            </div>
-            <div className='flex items-center'>
-              <button
-                onClick={() => signIn('twitter')}
-                className='ml-4 text-gray-800 hover:text-gray-900 hover:underline'
-              >
-                Sign in
-              </button>
-            </div>
-          </nav>
-        </div>
-      </header>
-    );
+    return <header className='bg-blue-100'></header>;
   }
 }

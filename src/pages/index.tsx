@@ -17,21 +17,20 @@ export default function HomePage() {
     return (
       <Layout>
         <Seo title='Sign in' />
-        <div className='-mt-24 flex min-h-screen flex-col items-center justify-center bg-gray-50 py-2 text-center sm:py-12'>
-          <h1 className='text-4xl font-bold'>Sign in with Twitter</h1>
-          <p className='mt-3 text-base text-gray-500 sm:mx-auto sm:mt-5 sm:max-w-xl sm:text-lg md:mt-5 md:text-xl lg:mx-0'>
-            BlueSearch is a Twitter client that helps you find the best tweets
-            and people. Sign in with Twitter to get started.
-          </p>
-          <div className='mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start'>
-            <div className='rounded-md shadow'>
-              <button
-                onClick={() => signIn('twitter')}
-                className='flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-8 py-3 text-base font-medium text-white hover:bg-blue-700 md:py-4 md:px-10 md:text-lg'
-              >
-                Sign in with Twitter
-              </button>
-            </div>
+
+        <div className='gradient flex h-screen items-center justify-center bg-gradient-to-r from-blue-600 to-blue-400'>
+          <div className='text-center text-white'>
+            <h1 className='mb-2 text-4xl font-bold'>BlueSearch</h1>
+            <h3 className='text-md mb-8'>
+              A Twitter client that helps you find the best tweets and people.
+              Sign in with Twitter to get started.
+            </h3>
+            <button
+              onClick={() => signIn('twitter')}
+              className='rounded-full bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700'
+            >
+              Sign in with Twitter
+            </button>
           </div>
         </div>
       </Layout>
