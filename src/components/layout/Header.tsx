@@ -4,10 +4,6 @@ import UnstyledLink from '@/components/links/UnstyledLink';
 import { signIn, signOut, useSession, getSession } from 'next-auth/react';
 import Link from 'next/link';
 const unsigned_links = [{ href: '/', label: 'Sign in' }];
-const signed_links = [
-  { href: '/', label: 'Top liked tweets' },
-  { href: '/', label: 'Tok liked quote tweets' },
-];
 
 export default function Header() {
   const { data: session } = useSession();
@@ -18,7 +14,16 @@ export default function Header() {
   if (session) {
     return (
       <header className='bg-blue-100'>
-        <div className='container mx-auto px-4'>
+        <div className='flex-shrink-0 bg-gray-900 py-4 px-6'>
+          <div className='flex items-center justify-between'>
+            <h1 className='text-lg font-bold text-white'>My Dashboard</h1>
+            <button className='focus:shadow-outline-blue rounded-lg py-1 px-3 font-bold text-white focus:outline-none active:bg-gray-700'>
+              Logout
+            </button>
+          </div>
+        </div>
+
+        {/* <div className='container mx-auto px-4'>
           <nav className='flex items-center justify-between py-4'>
             <div className='flex items-center'>
               <Link href='/'>
@@ -76,10 +81,21 @@ export default function Header() {
               </>
             </div>
           </nav>
-        </div>
+        </div> */}
       </header>
     );
   } else {
-    return <header className='bg-blue-100'></header>;
+    return (
+      <header className='bg-blue-100'>
+        <div className='flex-shrink-0 bg-gray-900 py-4 px-6'>
+          <div className='flex items-center justify-between'>
+            <h1 className='text-lg font-bold text-white'>My Dashboard</h1>
+            <button className='focus:shadow-outline-blue rounded-lg py-1 px-3 font-bold text-white focus:outline-none active:bg-gray-700'>
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+    );
   }
 }
