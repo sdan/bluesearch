@@ -184,8 +184,8 @@ export default function HomePage() {
     return (
       <Layout>
         <Seo title='Metrics' />
-        <div className='flex flex-col items-center justify-center py-2'>
-          <div className='flex flex-col items-center justify-center py-2'>
+        <div className=' py-2'>
+          <div className=' py-2'>
             <h1 className='text-2xl font-bold text-gray-900'>
               Twitter Metrics
             </h1>
@@ -202,7 +202,7 @@ export default function HomePage() {
             </p>
           </div>
         </div>
-        <div className='flex flex-col items-center justify-center py-2'>
+        <div className='py-2'>
           <button
             className='block rounded-md bg-blue-500 px-4 py-2 text-center text-white hover:bg-blue-600'
             onClick={() => {
@@ -219,10 +219,7 @@ export default function HomePage() {
         </div>
         {metricsData ? (
           metricsData.map((user: any) => (
-            <div
-              className='flex flex-col items-center justify-center py-2'
-              key={user.id}
-            >
+            <div className=' py-2' key={user.id}>
               <h1 className='text-center text-2xl font-bold'>
                 {user.name} has {user.followers} followers
               </h1>
