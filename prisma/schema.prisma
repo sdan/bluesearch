@@ -22,7 +22,7 @@ model Account {
   user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   LikedTweets       LikedTweets[]
   TimelineTweets    TimelineTweets[]
-  Following        Following[]
+  Following         Following[]
 
   @@unique([provider, providerAccountId])
 }
@@ -90,31 +90,36 @@ model LikedTweets {
 }
 
 model Following {
-  id        String   @id @unique @default(cuid())
-  username  String
-  name      String?
-  bio      String?
-  location  String?
-  url       String?
-  followers  Int      @default(0)
-  following  Int      @default(0)
-  tweets     Int?      @default(0)
-  latestTweet  DateTime?
-  latestLikes  DateTime?
-  userId    String
-  user      Account  @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
+  id          String    @id @unique @default(cuid())
+  username    String
+  name        String?
+  bio         String?
+  location    String?
+  url         String?
+  pfp              String?
+  followers   Int       @default(0)
+  following   Int       @default(0)
+  tweets      Int?      @default(0)
+  latestTweet DateTime?
+  latestLikes DateTime?
+  userId      String
+  user        Account   @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
 }
 
 // Metrics model to display followers and following metrics over time
 model Metrics {
-  userId   String @id
-  username  String
-  name      String?
-  bio      String?
-  location  String?
-  url       String?
-  followers  Int      @default(0)
-  following  Int      @default(0)
+  userId           String     @id
+  username         String
+  name             String?
+  bio              String?
+  location         String?
+  url              String?
+  pfp              String?
+  followers        Int        @default(0)
+  following        Int        @default(0)
+  tweets           Int       @default(0)
+  latestTweets           Int[]
+  fetchedTweets     DateTime[]
   latestFollowers  Int[]
   latestFollowing  Int[]
   fetchedFollowers DateTime[]

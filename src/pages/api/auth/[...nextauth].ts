@@ -24,6 +24,7 @@ export default NextAuth({
       // Insert refresh token into database
       const { providerAccountId, access_token, refresh_token } = account;
 
+      // update user profile image
       try {
         const data = await prisma.account.update({
           where: {
@@ -42,42 +43,32 @@ export default NextAuth({
         );
       }
 
-      console.log('SI profile', profile);
       return true;
     },
     async jwt({ token, account }) {
-      // console.log('JWT token', token);
-      // console.log('JWT account', account);
       if (account) {
         token.accessToken = account.access_token;
         console.log('JWT account.accessToken', token.accessToken);
-
-        // const tClient = new Client(String(token.accessToken));
-
-        // const {
-        //   data: { id },
-        // } = await tClient.users.findMyUser();
-
-        // console.log('JWT twtrId', id);
-
-        // token.twtrId = id;
       }
       return token;
     },
     async session({ session, token, user }) {
-      // console.log('SS SESSSION', session);
-      // console.log('SS TTTOOKKKEN', token);
-      // console.log('SS USER', user);
       const tClient = new Client(String(token.accessToken));
       console.log('SS TOKENACCESS', String(token.accessToken));
 
-      const id = (await tClient.users.findMyUser()).data?.id;
-      // const id: any = await tClient.users.findMyUser();
+      const tUser = (await tClient.users.findMyUser()).data;
+
+      const id = tUser.id;
+      const pfp = tUser.profile_image_url;
+      const username = tUser.username;
 
       console.log('SS twtrId', id);
 
       session.accessToken = token.accessToken;
       session.twtrId = id;
+      session.username = username;
+      session.pfp = pfp;
+
       return session;
     },
   },

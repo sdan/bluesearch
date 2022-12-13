@@ -14,9 +14,15 @@ type Props = {
   tweetlist: any[];
 };
 
+// Import navigation array from Layout component
+
+import { navigation } from '@/components/layout/Layout';
+
 export default function HomePage() {
   const { data: session } = useSession();
-
+  // All navigation array elements are false by default
+  navigation.map((item) => (item.current = false));
+  navigation[1].current = true;
   const tweetRenderer = (id: string) =>
     fetch(`/api/get-tweet-ast/${id}`).then((r) => r.json());
 

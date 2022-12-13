@@ -17,7 +17,10 @@ export default function Header() {
         <div className='flex-shrink-0 bg-gray-900 py-4 px-6'>
           <div className='flex items-center justify-between'>
             <h1 className='text-lg font-bold text-white'>My Dashboard</h1>
-            <button className='focus:shadow-outline-blue rounded-lg py-1 px-3 font-bold text-white focus:outline-none active:bg-gray-700'>
+            <button
+              onClick={() => signOut()}
+              className='focus:shadow-outline-blue rounded-lg py-1 px-3 font-bold text-white focus:outline-none active:bg-gray-700'
+            >
               Logout
             </button>
           </div>
@@ -90,7 +93,10 @@ export default function Header() {
         <div className='flex-shrink-0 bg-gray-900 py-4 px-6'>
           <div className='flex items-center justify-between'>
             <h1 className='text-lg font-bold text-white'>My Dashboard</h1>
-            <button className='focus:shadow-outline-blue rounded-lg py-1 px-3 font-bold text-white focus:outline-none active:bg-gray-700'>
+            <button
+              onClick={() => signOut()}
+              className='focus:shadow-outline-blue rounded-lg py-1 px-3 font-bold text-white focus:outline-none active:bg-gray-700'
+            >
               Logout
             </button>
           </div>
