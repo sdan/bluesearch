@@ -14,6 +14,7 @@ import {
   InboxIcon,
   UsersIcon,
   XMarkIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 
@@ -24,10 +25,15 @@ export const navigation = [
   {
     name: 'Sort Timeline',
     href: '/top_liked',
+    icon: ClockIcon,
+    current: false,
+  },
+  {
+    name: 'Public Analytics',
+    href: '/metrics',
     icon: ChartBarIcon,
     current: false,
   },
-  { name: 'Team', href: '#', icon: UsersIcon, current: false },
   { name: 'Projects', href: '#', icon: FolderIcon, current: false },
   { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
   { name: 'Documents', href: '#', icon: InboxIcon, current: false },
