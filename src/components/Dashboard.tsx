@@ -18,7 +18,7 @@ import moment from 'moment';
 const projects = [
   {
     id: 1,
-    title: 'doesnt work on mobile!',
+    title: 'doesnt work in mobile correctly',
     initials: '',
     team: '',
     members: [

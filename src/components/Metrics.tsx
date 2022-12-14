@@ -32,9 +32,9 @@ import { CheckCircleIcon } from '@heroicons/react/24/outline';
 const projects = [
   {
     id: 1,
-    title: 'GraphQL API',
-    initials: 'GA',
-    team: 'Engineering',
+    title: 'doesnt work in mobile correctly',
+    initials: '',
+    team: '',
     members: [
       {
         name: 'Dries Vincent',
