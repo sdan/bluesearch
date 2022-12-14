@@ -587,7 +587,7 @@ export function MainPage(session: any) {
                     scope='col'
                     className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'
                   >
-                    Role
+                    Status
                   </th>
                 </tr>
               </thead>
