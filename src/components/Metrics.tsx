@@ -298,15 +298,16 @@ export function MetricsPage(props: {
             >
               Share
             </button> */}
-            <button
-              type='button'
-              onClick={() => {
-                trigger();
-              }}
-              className='order-0 inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 sm:order-1 sm:ml-3'
-            >
-              {isMutating ? (
-                <>
+
+            {isMutating ? (
+              <>
+                <button
+                  type='button'
+                  onClick={() => {
+                    trigger();
+                  }}
+                  className='order-0 inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 sm:order-1 sm:ml-3'
+                >
                   <svg
                     role='status'
                     className='mr-3 inline h-4 w-4 animate-spin text-white'
@@ -324,11 +325,29 @@ export function MetricsPage(props: {
                     />
                   </svg>
                   Fetching...
-                </>
-              ) : (
-                'Refresh stats'
-              )}
-            </button>
+                </button>
+              </>
+            ) : props?.session?.accessToken ? (
+              <button
+                type='button'
+                onClick={() => {
+                  trigger();
+                }}
+                className='order-0 inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 sm:order-1 sm:ml-3'
+              >
+                Refresh stats
+              </button>
+            ) : (
+              <button
+                type='button'
+                onClick={() => {
+                  signIn('twitter');
+                }}
+                className='order-0 inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 sm:order-1 sm:ml-3'
+              >
+                Sign in to refresh stats
+              </button>
+            )}
 
             <div className='mt-2 max-w-xl text-sm text-gray-500'>
               <p>
@@ -524,7 +543,7 @@ export function MetricsPage(props: {
                       <a
                         href='#'
                         onClick={() => {
-                          setPageNumber(pageNumber + 1);
+                          setPageNumber(pageNumber - 1);
                         }}
                         className='relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50'
                       >

@@ -26,14 +26,16 @@ export async function PullFollowActivity(twtrId: any) {
     select: {
       Following: {
         orderBy: {
-          latestLikes: 'asc',
+          latestTweet: 'asc',
         },
         select: {
           id: true,
           username: true,
           name: true,
-          latestLikes: true,
           latestTweet: true,
+          latestLikes: true,
+          pfp: true,
+          bio: true,
         },
       },
     },

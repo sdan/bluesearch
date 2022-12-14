@@ -11,15 +11,16 @@ import {
   EllipsisVerticalIcon,
   MagnifyingGlassIcon,
 } from '@heroicons/react/20/solid';
+import moment from 'moment';
 
 // Consts
 /////////////////////////
 const projects = [
   {
     id: 1,
-    title: 'GraphQL API',
-    initials: 'GA',
-    team: 'Engineering',
+    title: 'doesnt work on mobile!',
+    initials: '',
+    team: '',
     members: [
       {
         name: 'Dries Vincent',
@@ -282,7 +283,12 @@ export function MainPage(session: any) {
   // Pull inactive users
   //////////////
 
-  function pullMetrics(args: any) {
+  type ApiRequest = {
+    accessToken: any;
+    twtrId: any;
+  };
+
+  function pullStats(args: any) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
       console.log('PT args', args);
       console.log('url', args.url);
@@ -291,21 +297,27 @@ export function MainPage(session: any) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        accessToken: args.args.accessToken,
         twtrId: args.args.twtrId,
       }),
     }).then((res) => res.json());
   }
 
-  function fetchMetrics(args: any) {
+  function fetchStats(args: any) {
+    // console.log('access token fetcher', session?.accessToken, session?.twtrId);
+    // console.log('arg.accessToken', arg.accessToken);
+    // console.log('arg.twtrId', arg.twtrId);
+    console.log('fetchStats args', args);
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('FT args', args);
+      console.log('LT args', session.props.accessToken);
+      console.log('LT twtrid', session.props.twtrId);
     }
     return fetch(args[0], {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        accessToken: args[1].accessToken,
-        twtrId: args[1].twtrId,
+        accessToken: args[1]?.accessToken,
+        twtrId: args[1]?.twtrId,
       }),
     }).then((res) => res.json());
   }
@@ -314,75 +326,59 @@ export function MainPage(session: any) {
   // keep fetching from db
 
   // initialize variable args as type ApiRequest
-  const pullTweetArgs: ApiRequest = {
-    accessToken: '',
-    twtrId: session?.twtrId,
+  const pullFollowerActivityArgs: ApiRequest = {
+    accessToken: session.props?.accessToken,
+    twtrId: session.props?.twtrId,
   };
   if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-    console.log('session?.twtrId', session?.twtrId);
+    console.log('session?.twtrId', session.props?.twtrId);
   }
 
-  const { data: metricsData, error: metricsError } = useSWR(
-    { url: '/api/twitter/metrics/pull', args: pullTweetArgs },
-    pullMetrics
+  const { data: pullInactiveUsersData, error: pullInactiveUsersError } = useSWR(
+    { url: '/api/twitter/inactive/pull', args: pullFollowerActivityArgs },
+    pullStats
   );
-  if (metricsError) {
+  if (pullInactiveUsersError) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('metricsError', metricsError);
+      console.log('inactive error', pullInactiveUsersError);
     }
   }
-  if (metricsData) {
+  if (pullInactiveUsersData) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('tweetsFromDB', metricsData[0]);
+      console.log('pullInactiveUsersData', pullInactiveUsersData);
     }
   } else {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('no data');
+      console.log('no inactive data', pullInactiveUsersData);
     }
   }
 
-  const fetchMetricsArgs: ApiRequest = {
-    accessToken: session?.accessToken,
-    twtrId: session?.twtrId,
+  const fetchStatsArgs: ApiRequest = {
+    accessToken: session.props?.accessToken,
+    twtrId: session.props?.twtrId,
   };
-
   const {
-    data: fetchedTweets,
+    data: fetchedStats,
     trigger,
     isMutating,
-    error: fetchedTweetError,
+    error: fetchedStatsError,
   } = useSWRMutation(
-    ['/api/internal/metrics/fetch', fetchMetricsArgs],
-    fetchMetrics
+    ['/api/internal/inactive/fetch', fetchStatsArgs],
+    fetchStats
   );
 
-  if (fetchedTweetError) {
-    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('fetchedTweetError', fetchedTweetError);
-    }
-  }
-  if (fetchedTweets) {
-    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('fetchedTweets', fetchedTweets);
-    }
-  } else {
-    if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('no fetchedTweets');
-    }
+  if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
+    console.log('fetchedTweet Error', fetchedStatsError);
+    console.log('fetchedTweets', fetchedStats);
   }
 
-  // if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-  console.log('fetchedTweet Error', fetchedTweetError);
-  console.log('fetchedTweets', fetchedTweets);
-  // }
+  ////////////////////////////////////
 
-  //////////////////
-
-  //Use swr to fetch /api/dashboard/pull to get the latest data
+  //Use swr to fetch /api/dashboard/pull to get the latest profile data for current user
 
   function pullDashboardStats(args: any) {
     if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-      console.log('PT args', args);
+      console.log('pull dash stats args', session.props.twtrId);
       console.log('url', args.url);
     }
     return fetch(args.url, {
@@ -396,10 +392,10 @@ export function MainPage(session: any) {
 
   const pullDashboardStatsArgs: any = {
     accessToken: '',
-    twtrId: session?.props.twtrId,
+    twtrId: session.props?.twtrId,
   };
   if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
-    console.log('session?.twtrId', session?.props?.twtrId);
+    console.log('session?.twtrId', session.props?.twtrId);
   }
 
   const { data: dashboardStats, error: dashboardError } = useSWR(
@@ -426,6 +422,7 @@ export function MainPage(session: any) {
     { name: 'Following', stat: dashboardStats?.following },
     { name: 'Tweets', stat: dashboardStats?.tweets },
   ];
+  ////////////////////////////////////
 
   const people = [
     {
@@ -453,18 +450,43 @@ export function MainPage(session: any) {
             </h1>
           </div>
           <div className='mt-4 flex sm:mt-0 sm:ml-4'>
-            <button
-              type='button'
-              className='sm:order-0 order-1 ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 sm:ml-0'
-            >
-              Share
-            </button>
-            <button
-              type='button'
-              className='order-0 inline-flex items-center rounded-md border border-transparent bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 sm:order-1 sm:ml-3'
-            >
-              Create
-            </button>
+            {isMutating ? (
+              <>
+                <button
+                  type='button'
+                  onClick={() => {
+                    trigger();
+                  }}
+                  className='order-0 inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 sm:order-1 sm:ml-3'
+                >
+                  <svg
+                    role='status'
+                    className='mr-3 inline h-4 w-4 animate-spin text-white'
+                    viewBox='0 0 100 101'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z'
+                      fill='#E5E7EB'
+                    />
+                    <path
+                      d='M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z'
+                      fill='currentColor'
+                    />
+                  </svg>
+                  Fetching...
+                </button>
+              </>
+            ) : (
+              <button
+                type='button'
+                onClick={() => trigger(fetchStatsArgs)}
+                className='order-0 inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 sm:order-1 sm:ml-3'
+              >
+                Refresh user stats
+              </button>
+            )}
           </div>
         </div>
         {/* Pinned projects */}
@@ -547,13 +569,19 @@ export function MainPage(session: any) {
                     scope='col'
                     className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'
                   >
-                    Title
+                    Bio
                   </th>
                   <th
                     scope='col'
                     className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'
                   >
-                    Status
+                    Last tweet
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'
+                  >
+                    Last liked tweet
                   </th>
                   <th
                     scope='col'
@@ -565,8 +593,8 @@ export function MainPage(session: any) {
               </thead>
 
               <tbody className='divide-y divide-gray-200 bg-white'>
-                {metricsData ? (
-                  metricsData.map((user: any) => (
+                {pullInactiveUsersData ? (
+                  pullInactiveUsersData.map((user: any) => (
                     <tr key={user.id}>
                       <td className='whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6'>
                         <div className='flex items-center'>
@@ -581,18 +609,43 @@ export function MainPage(session: any) {
                             <div className='font-medium text-gray-900'>
                               {user.name}
                             </div>
-                            <div className='text-gray-500'>{user.username}</div>
+                            <div className='text-gray-500'>
+                              <a href={`https://twitter.com/` + user.username}>
+                                {user.username}
+                              </a>
+                            </div>
                           </div>
                         </div>
                       </td>
                       <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
-                        <div className='text-gray-900'>{user.followers}</div>
-                        <div className='text-gray-500'>{user.following}</div>
+                        {user.bio.length > 50 ? (
+                          <>{user.bio.substring(0, 50).concat('...')}</>
+                        ) : (
+                          <>{user.bio}</>
+                        )}
                       </td>
                       <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
-                        <span className='inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800'>
-                          Active
-                        </span>
+                        <div className='text-gray-900'>
+                          {moment(user.latestTweet).fromNow()}
+                        </div>
+                      </td>
+                      <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
+                        <div className='text-gray-500'>
+                          {moment(user.latestLikes).fromNow()}
+                        </div>
+                      </td>
+                      <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
+                        {moment(user.latestLikes).isBefore(
+                          moment().subtract(1, 'months')
+                        ) ? (
+                          <span className='inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800'>
+                            Inactive
+                          </span>
+                        ) : (
+                          <span className='inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800'>
+                            Active
+                          </span>
+                        )}
                       </td>
                       {/* <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
                         {person.role}
