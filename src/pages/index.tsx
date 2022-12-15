@@ -11,8 +11,6 @@ export default function HomePage() {
   console.log('SESS frontend', session);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  console.log('SESS hello', process.env.HELLO);
-
   if (!session) {
     return <LandingPage />;
   } else {

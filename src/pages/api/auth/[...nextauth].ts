@@ -11,8 +11,8 @@ export default NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
     TwitterProvider({
-      clientId: process.env.TWITTER_CLIENT_ID!,
-      clientSecret: process.env.TWITTER_CLIENT_SECRET!,
+      clientId: process.env.TWITTER_CLIENT_ID,
+      clientSecret: process.env.TWITTER_CLIENT_SECRET,
       version: '2.0',
     }),
   ],

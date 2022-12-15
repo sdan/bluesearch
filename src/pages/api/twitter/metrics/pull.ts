@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 // API Handler is just for test, import this function into your API route
 export default async function handle(req: any, res: any) {
-  console.log('in inactive api pull');
+  console.log('in metrics api pull');
   console.log('req.body', req.body);
   const { accessToken, twtrId, page } = req.body;
   console.log('aT metrics pull frontend', accessToken);
