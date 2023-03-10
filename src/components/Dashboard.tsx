@@ -361,6 +361,25 @@ export function MainPage(session: any) {
     fetchStats
   );
 
+  function fetchUnfollow(url, { arg }) {
+    console.log('fetchUnfollow args', arg);
+    console.log('fetchUnfollow url', url);
+    console.log('session.props?.accessToken', session.props?.accessToken);
+    console.log('session.props?.twtrId', session.props?.twtrId);
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accessToken: session.props?.accessToken,
+        twtrId: session.props?.twtrId,
+        unfollowId: arg,
+      }),
+    }).then((res) => res.json());
+  }
+
+  const { trigger: triggerUnfollow, isMutating: isMutatingUnfollow } =
+    useSWRMutation('/api/twitter/dashboard/fetch', fetchUnfollow);
+
   if (process.env.NEXT_PUBLIC_VERCEL_ENV != 'production') {
     console.log('fetchedTweet Error', fetchedStatsError);
     console.log('fetchedTweets', fetchedStats);
@@ -806,8 +825,9 @@ export function MainPage(session: any) {
                                 moment().subtract(3, 'months')
                               ) && (
                                 <button
+                                  disabled={isMutatingUnfollow}
                                   className='ml-3 inline-flex rounded-md border border-gray-300 bg-red-500 px-4 py-2 font-semibold text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
-                                  onClick={() => unfollowUser(user.id)}
+                                  onClick={() => triggerUnfollow(user.id)}
                                 >
                                   Unfollow
                                 </button>
