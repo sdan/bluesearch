@@ -435,35 +435,50 @@ export function MainPage(session: any) {
 
   // Define initial sort states for each field
   const initialSortState = {
-    latestTweet: { field: 'latestTweet', order: 'desc' },
-    latestLikes: { field: 'latestLikes', order: 'desc' },
+    latestLikes: { field: 'latestLikes', order: 'asc' },
+    latestTweet: { field: 'latestTweet', order: 'asc' },
   };
 
-  // Define the state for the sort field and order
-  const [sort, setSort] = useState(initialSortState);
+  // Define the state for the sort field and order for latestTweet
+  const [latestTweetSort, setLatestTweetSort] = useState(
+    initialSortState.latestTweet
+  );
 
-  // Define a function to handle sorting by a given field
-  const handleSort = (field: any) => {
-    if (sort.field === field) {
-      // If the same field is clicked, toggle the sort order
-      setSort({ field, order: sort.order === 'asc' ? 'desc' : 'asc' });
+  // Define the state for the sort field and order for latestLikes
+  const [latestLikesSort, setLatestLikesSort] = useState(
+    initialSortState.latestLikes
+  );
+
+  const [lastSortField, setLastSortField] = useState('');
+
+  // Define a function to handle sorting by a given field for latestLikes
+  const handleLatestLikesSort = () => {
+    if (latestLikesSort.order === 'asc') {
+      setLatestLikesSort({ field: 'latestLikes', order: 'desc' });
     } else {
-      // If a new field is clicked, set the sort field to the new field and set the default sort order as the sort order
-      setSort({ field, order: initialSortState.order });
+      setLatestLikesSort({ field: 'latestLikes', order: 'asc' });
     }
+    setLastSortField('latestLikes');
   };
 
-  // Sort the data based on the current sort field and order
-  const sortedData = pullInactiveUsersData
+  // Define a function to handle sorting by a given field for latestTweet
+  const handleLatestTweetSort = () => {
+    if (latestTweetSort.order === 'asc') {
+      setLatestTweetSort({ field: 'latestTweet', order: 'desc' });
+    } else {
+      setLatestTweetSort({ field: 'latestTweet', order: 'asc' });
+    }
+    setLastSortField('latestTweet');
+  };
+
+  // Sort the data based on the current sort field and order for latestTweet
+  const sortedLatestTweetData = pullInactiveUsersData
     ? pullInactiveUsersData
         .sort((a, b) => {
-          const order = sort.order === 'asc' ? 1 : -1;
+          const order = latestTweetSort.order === 'asc' ? 1 : -1;
 
-          const aDate = moment(a[sort.field]);
-          const bDate = moment(b[sort.field]);
-          console.log('sort field', sort.field);
-          console.log('aDate', aDate);
-          console.log('bDate', bDate);
+          const aDate = moment(a.latestTweet);
+          const bDate = moment(b.latestTweet);
 
           if (aDate.isBefore(bDate)) {
             return -1 * order;
@@ -476,7 +491,30 @@ export function MainPage(session: any) {
         .map((user) => [user])
     : [];
 
-  console.log('sortedData', sortedData);
+  // Sort the data based on the current sort field and order for latestLikes
+  const sortedLatestLikesData = pullInactiveUsersData
+    ? pullInactiveUsersData
+        .sort((a, b) => {
+          const order = latestLikesSort.order === 'asc' ? 1 : -1;
+
+          const aDate = moment(a.latestLikes);
+          const bDate = moment(b.latestLikes);
+
+          if (aDate.isBefore(bDate)) {
+            return -1 * order;
+          }
+          if (aDate.isAfter(bDate)) {
+            return 1 * order;
+          }
+          return 0;
+        })
+        .map((user) => [user])
+    : [];
+
+  const sortedData =
+    lastSortField === 'latestTweet'
+      ? sortedLatestTweetData
+      : sortedLatestLikesData;
 
   return (
     <div className=''>
@@ -647,18 +685,18 @@ export function MainPage(session: any) {
                     Bio
                   </th>
 
-                  <th onClick={() => handleSort('latestTweet')}>
+                  <th onClick={handleLatestTweetSort}>
                     Last tweet{' '}
-                    {sort &&
-                      sort.field === 'latestTweet' &&
-                      (sort.order === 'asc' ? '↑' : '↓')}
+                    {latestTweetSort && latestTweetSort.order === 'desc'
+                      ? '↑'
+                      : '↓'}
                   </th>
 
-                  <th onClick={() => handleSort('latestLikes')}>
+                  <th onClick={handleLatestLikesSort}>
                     Last liked tweet{' '}
-                    {sort &&
-                      sort.field === 'latestLikes' &&
-                      (sort.order === 'asc' ? '↑' : '↓')}
+                    {latestLikesSort && latestLikesSort.order === 'desc'
+                      ? '↑'
+                      : '↓'}
                   </th>
 
                   <th
@@ -667,8 +705,8 @@ export function MainPage(session: any) {
                   >
                     Status
                     <span className='pointer-events-none absolute top-full left-0 z-10 w-48 max-w-xs rounded-lg bg-gray-800 py-1 px-2 text-sm text-white opacity-0 shadow-lg'>
-                      This user has not liked a tweet in the past 3 months and
-                      may no longer be active on Twitter.
+                      This user has not liked a tweet and tweeted in the past 3
+                      months and may no longer be active on Twitter.
                     </span>
                     <div
                       className='absolute inset-0 cursor-pointer'
@@ -746,6 +784,9 @@ export function MainPage(session: any) {
                           <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
                             {moment(user.latestLikes).isBefore(
                               moment().subtract(3, 'months')
+                            ) &&
+                            moment(user.latestTweet).isBefore(
+                              moment().subtract(3, 'months')
                             ) ? (
                               <span className='relative inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800'>
                                 Inactive
@@ -756,17 +797,21 @@ export function MainPage(session: any) {
                               </span>
                             )}
                           </td>
+
                           <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
                             {moment(user.latestLikes).isBefore(
                               moment().subtract(3, 'months')
-                            ) && (
-                              <button
-                                className='ml-3 inline-flex rounded-md border border-gray-300 bg-red-500 px-4 py-2 font-semibold text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
-                                onClick={() => unfollowUser(user.id)}
-                              >
-                                Unfollow
-                              </button>
-                            )}
+                            ) &&
+                              moment(user.latestTweet).isBefore(
+                                moment().subtract(3, 'months')
+                              ) && (
+                                <button
+                                  className='ml-3 inline-flex rounded-md border border-gray-300 bg-red-500 px-4 py-2 font-semibold text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                                  onClick={() => unfollowUser(user.id)}
+                                >
+                                  Unfollow
+                                </button>
+                              )}
                           </td>
                         </tr>
                       ))
