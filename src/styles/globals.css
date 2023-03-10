@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.sort-arrow-tweet {
+  font-size: 0.8em;
+  margin-left: 5px;
+}
+
+.sort-arrow-liked {
+  font-size: 0.8em;
+  margin-left: 5px;
+}

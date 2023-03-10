@@ -17,8 +17,8 @@ export default async function handle(
   );
 
   let data = await fetch(
-    'https://api.bluesearch.xyz/api/external/inactive/fetch',
-    // 'http://localhost:3001/api/external/inactive/fetch',
+    // 'https://api.bluesearch.xyz/api/external/inactive/fetch',
+    'http://localhost:3001/api/external/inactive/fetch',
     {
       method: 'POST',
       headers: {
