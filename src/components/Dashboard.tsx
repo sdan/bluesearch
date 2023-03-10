@@ -361,11 +361,16 @@ export function MainPage(session: any) {
     fetchStats
   );
 
+  const [unfollowedUsers, setUnfollowedUsers] = useState([]);
+
   function fetchUnfollow(url, { arg }) {
     console.log('fetchUnfollow args', arg);
     console.log('fetchUnfollow url', url);
     console.log('session.props?.accessToken', session.props?.accessToken);
     console.log('session.props?.twtrId', session.props?.twtrId);
+
+    setUnfollowedUsers([...unfollowedUsers, arg]);
+
     return fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -575,9 +580,10 @@ export function MainPage(session: any) {
                 </button>
               </>
             ) : (
-              <button className='relative rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'>
-                Mass Unfollow Inactive Users
-              </button>
+              // <button className='relative rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'>
+              //   Mass Unfollow Inactive Users
+              // </button>
+              <></>
             )}
           </div>
           <div className='mt-4 flex sm:mt-0 sm:ml-4'>
@@ -825,11 +831,20 @@ export function MainPage(session: any) {
                                 moment().subtract(3, 'months')
                               ) && (
                                 <button
-                                  disabled={isMutatingUnfollow}
-                                  className='ml-3 inline-flex rounded-md border border-gray-300 bg-red-500 px-4 py-2 font-semibold text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                                  className={`ml-3 inline-flex rounded-md border border-gray-300 px-4 py-2 font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                                    unfollowedUsers.includes(user.id)
+                                      ? 'cursor-default bg-gray-300'
+                                      : 'bg-red-500 hover:bg-red-600 focus:ring-red-500 focus:ring-offset-2'
+                                  }`}
+                                  disabled={
+                                    isMutatingUnfollow ||
+                                    unfollowedUsers.includes(user.id)
+                                  }
                                   onClick={() => triggerUnfollow(user.id)}
                                 >
-                                  Unfollow
+                                  {unfollowedUsers.includes(user.id)
+                                    ? 'Unfollowed'
+                                    : 'Unfollow'}
                                 </button>
                               )}
                           </td>
